@@ -147,47 +147,89 @@ for adapter in bootstrap.wifi_adapters:
 
 ## Packet Testing API
 
-### PacketSender
+### Working Implementation (packet_test_fixed)
 
-Sends WATR packets in monitor mode.
+The fixed implementation uses 802.11 data frames with LLC/SNAP encapsulation for reliable transmission.
+
+#### PacketSender
+
+Sends WATR packets using data frames.
 
 ```python
-from watr.packet_test import PacketSender, TestConfig
+from watr.packet_test_fixed import PacketSender, TestConfig
 
 config = TestConfig(
-    interface="wlan1",
-    channel=6,
-    count=10,
-    interval=1.0,
-    payload="Test message"
+    interface="mon0",      # Monitor interface
+    channel=1,             # Channel 1 (2412 MHz)
+    count=10,             # Number of packets
+    interval=1.0,         # Seconds between packets
+    payload="Test message",
+    src_mac="00:11:22:33:44:55",
+    dst_mac="66:77:88:99:AA:BB"
 )
 
 sender = PacketSender(config)
 sender.send_packets()
 ```
 
-### PacketReceiver
+**Methods:**
+- `create_watr_data_frame(sequence)`: Creates 802.11 data frame with WATR payload
+- `send_packets()`: Sends configured number of packets
 
-Receives WATR packets in monitor mode.
+#### PacketReceiver
+
+Receives WATR packets using data frame filtering.
 
 ```python
-from watr.packet_test import PacketReceiver, TestConfig
+from watr.packet_test_fixed import PacketReceiver, TestConfig
 
-config = TestConfig(interface="wlan1", channel=6)
+config = TestConfig(interface="mon0", channel=1)
 receiver = PacketReceiver(config)
 receiver.start_sniffing()
 ```
 
-### TestConfig
+**Methods:**
+- `packet_handler(packet)`: Processes received packets
+- `start_sniffing()`: Begins packet capture
+- `stop_sniffing()`: Stops packet capture
+- `print_summary()`: Displays reception statistics
 
-Configuration for packet testing.
+#### TestConfig
+
+Enhanced configuration for packet testing.
 
 **Parameters:**
-- `interface`: WiFi interface to use
-- `channel`: WiFi channel (default: 6)
+- `interface`: Monitor interface (default: "mon0")
+- `channel`: WiFi channel (default: 1)
 - `count`: Number of packets to send
 - `interval`: Seconds between packets
 - `payload`: Message payload
+- `src_mac`: Source MAC address
+- `dst_mac`: Destination MAC address
+
+### Monitor Interface Setup
+
+```python
+from watr.packet_test_fixed import setup_monitor_interface, check_monitor_interface
+
+# Check if monitor interface exists
+if not check_monitor_interface("mon0"):
+    # Create monitor interface
+    setup_monitor_interface(phy="phy0", interface="mon0")
+```
+
+### Frame Structure
+
+The working implementation creates packets with this structure:
+
+```python
+# 802.11 Data Frame
+frame = RadioTap() / \
+        Dot11(type=2, subtype=0, addr1=dst, addr2=src, addr3=src) / \
+        LLC(dsap=0xAA, ssap=0xAA, ctrl=0x03) / \
+        SNAP(OUI=0x000000, code=0x8999) / \
+        Raw(load=watr_packet_bytes)
+```
 
 ## C++ API
 

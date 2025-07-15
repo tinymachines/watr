@@ -262,8 +262,17 @@ cd build && ctest
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## Documentation
+
+- [Quick Start Guide](QUICKSTART.md) - Get started in 5 minutes
+- [Packet Transmission Guide](docs/PACKET_TRANSMISSION.md) - Detailed transmission documentation
+- [API Reference](docs/API.md) - Complete API documentation
+- [Deployment Guide](docs/DEPLOYMENT.md) - Installation and deployment
+- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
+
 ## Acknowledgments
 
 - Built with [pybind11](https://github.com/pybind/pybind11) for Python bindings
 - Uses [Scapy](https://scapy.net/) for packet manipulation
 - Optimized for Raspberry Pi 4 ARM64 architecture
+- Based on working implementation from [protoc/custom.py](protoc/custom.py)
