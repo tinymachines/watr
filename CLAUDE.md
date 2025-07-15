@@ -148,3 +148,60 @@ tar -xzf /tmp/watr-dist-*.tar.gz
 cd watr-dist-*/scripts
 ./setup.sh
 ```
+
+## Wireless Adapter Bootstrap
+
+WATR includes a bootstrap utility to detect and configure WiFi and Bluetooth adapters for protocol development.
+
+### Bootstrap Command
+```bash
+# Run adapter detection and configuration
+python bootstrap.py
+
+# Or with virtual environment
+source venv/bin/activate
+python bootstrap.py
+```
+
+### Adapter Detection Features
+- **WiFi Adapters**: Detects onboard and USB WiFi adapters
+- **Monitor Mode Testing**: Practical testing of monitor mode capabilities
+- **Bluetooth Detection**: Identifies Bluetooth adapters
+- **RFKill Management**: Automatically unblocks wireless adapters
+- **Configuration Export**: Saves adapter info to JSON for other tools
+
+### Typical RPi4 Setup
+```
+🔌 WiFi Adapters (2 found):
+  🔴 wlan0 (phy0) - Onboard brcmfmac - Monitor: NO
+  🟢 wlan1 (phy3) - USB rtl8xxxu - Monitor: YES
+
+📱 Bluetooth Adapters (1 found):
+  🔵 hci0 - Onboard Bluetooth
+```
+
+### Monitor Mode Operations
+```bash
+# Set monitor mode (requires sudo)
+sudo ip link set wlan1 down
+sudo iw dev wlan1 set type monitor
+sudo ip link set wlan1 up
+
+# Check monitor mode status
+iw dev wlan1 info
+
+# Return to managed mode
+sudo ip link set wlan1 down
+sudo iw dev wlan1 set type managed
+sudo ip link set wlan1 up
+```
+
+### Using with Scapy
+```python
+# Example: Use monitor-capable adapter for packet sniffing
+from scapy.all import *
+
+# Monitor mode should be set first
+# Interface wlan1 (USB adapter) supports monitor mode
+sniff(iface="wlan1", prn=lambda x: x.summary())
+```
