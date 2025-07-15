@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-WATR is a custom protocol development project that combines C/C++ high-performance components with Python bindings and Scapy integration for packet crafting and analysis.
+WATR is a custom protocol development project that combines C/C++ high-performance components with Python bindings and Scapy integration for packet crafting and analysis. The project is specifically optimized for ARM64/Raspberry Pi 4 deployment and includes WiFi monitor mode capabilities for packet injection and capture.
 
 ## Architecture
 
@@ -12,7 +12,10 @@ WATR is a custom protocol development project that combines C/C++ high-performan
 - **Python Bindings (`src/bindings.cpp`)**: pybind11 bridge between C++ and Python
 - **Python Package (`python/watr/`)**: Python API and Scapy integration
 - **Scapy Submodule (`scapy/`)**: Git submodule for packet manipulation
+- **Bootstrap System (`python/watr/bootstrap.py`)**: Adapter detection and configuration
+- **Packet Testing (`python/watr/packet_test.py`)**: Monitor mode packet transmission
 - **Tests (`tests/`)**: Test suite for both C++ and Python components
+- **Deployment Scripts**: Automated deployment and distribution building
 
 ## Development Setup
 
@@ -248,3 +251,28 @@ sudo ./test-packets receive
 2. **Start receiver**: `sudo /opt/watr/venv/bin/python test-receive.py` on device 1
 3. **Start sender**: `sudo /opt/watr/venv/bin/python test-send.py` on device 2
 4. **Verify transmission**: Check packet counters on both devices
+
+## Debugging Packet Transmission
+
+### Known Issues
+- **Packet Reception**: Some WiFi adapters may support monitor mode but not properly capture injected frames
+- **Driver Limitations**: Certain drivers filter out frames with synthetic MAC addresses
+- **Channel Sync**: Ensure both sender and receiver are on the same channel
+
+### Debug Scripts
+```bash
+# Enhanced debug receiver with detailed output
+sudo /opt/watr/venv/bin/python debug-receive.py
+
+# Enhanced debug sender with packet details
+sudo /opt/watr/venv/bin/python debug-send.py
+
+# Verify monitor mode functionality
+sudo python3 verify-monitor.py wlan1
+```
+
+### Testing Approach
+1. Verify monitor mode with standard tools (tcpdump, airodump-ng)
+2. Test with simple beacon frames before WATR packets
+3. Check dmesg for driver errors during packet injection
+4. Try different channels (1, 6, 11) for better success
