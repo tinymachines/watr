@@ -252,27 +252,46 @@ sudo ./test-packets receive
 3. **Start sender**: `sudo /opt/watr/venv/bin/python test-send.py` on device 2
 4. **Verify transmission**: Check packet counters on both devices
 
-## Debugging Packet Transmission
+## Working Packet Transmission Solution
 
-### Known Issues
-- **Packet Reception**: Some WiFi adapters may support monitor mode but not properly capture injected frames
-- **Driver Limitations**: Certain drivers filter out frames with synthetic MAC addresses
-- **Channel Sync**: Ensure both sender and receiver are on the same channel
+### Key Implementation Details
+The working solution uses **802.11 Data frames** instead of beacon/management frames:
 
-### Debug Scripts
+1. **Frame Type**: Use type=2 (Data), subtype=0 for reliable transmission
+2. **Encapsulation**: LLC/SNAP headers with custom protocol ID (0x8999)
+3. **Monitor Interface**: Dedicated `mon0` interface for packet injection/capture
+4. **Frame Structure**: RadioTap / Dot11 / LLC / SNAP / Raw(WATR payload)
+
+### Setup Monitor Interface
 ```bash
-# Enhanced debug receiver with detailed output
-sudo /opt/watr/venv/bin/python debug-receive.py
+# Automatic setup (finds suitable PHY)
+sudo ./setup-monitor.sh auto
 
-# Enhanced debug sender with packet details
-sudo /opt/watr/venv/bin/python debug-send.py
+# Manual setup with specific PHY
+sudo ./setup-monitor.sh phy0
 
-# Verify monitor mode functionality
-sudo python3 verify-monitor.py wlan1
+# Or using iw directly
+sudo iw phy phy0 interface add mon0 type monitor
+sudo iw dev mon0 set freq 2412  # Channel 1
+sudo ip link set mon0 up
 ```
 
-### Testing Approach
-1. Verify monitor mode with standard tools (tcpdump, airodump-ng)
-2. Test with simple beacon frames before WATR packets
-3. Check dmesg for driver errors during packet injection
-4. Try different channels (1, 6, 11) for better success
+### Working Test Commands
+```bash
+# Fixed implementation that works
+sudo python -m watr.packet_test_fixed send
+sudo python -m watr.packet_test_fixed receive
+
+# Or use simple test scripts
+sudo /opt/watr/venv/bin/python test-watr-send.py
+sudo /opt/watr/venv/bin/python test-watr-receive.py
+```
+
+### Why This Works
+1. **Data frames** are less filtered by drivers than management frames
+2. **LLC/SNAP encapsulation** provides proper protocol identification
+3. **Custom protocol ID** (0x8999) avoids conflicts with standard protocols
+4. **Dedicated monitor interface** ensures proper injection capabilities
+
+### Original Working Code Reference
+The solution is based on working code from `protoc/custom.py` which successfully transmits packets between devices using this approach.

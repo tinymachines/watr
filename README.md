@@ -122,26 +122,38 @@ Output example:
 
 ## Packet Testing
 
-Test packet transmission between devices:
+Test packet transmission between devices using the working implementation:
 
-### Sender
+### Setup Monitor Interface
+First, create a dedicated monitor interface:
 ```bash
-sudo /opt/watr/venv/bin/python test-send.py
+sudo ./setup-monitor.sh auto
 ```
 
-### Receiver
+### Working Implementation
+The fixed implementation uses 802.11 data frames with LLC/SNAP encapsulation:
+
 ```bash
-sudo /opt/watr/venv/bin/python test-receive.py
+# Sender (on device 1)
+sudo python -m watr.packet_test_fixed send
+
+# Receiver (on device 2)
+sudo python -m watr.packet_test_fixed receive
 ```
 
-### Coordinated Test
+### Simple Test Scripts
 ```bash
 # On device 1 (receiver)
-sudo ./test-packets receive
+sudo /opt/watr/venv/bin/python test-watr-receive.py
 
 # On device 2 (sender)
-sudo ./test-packets send
+sudo /opt/watr/venv/bin/python test-watr-send.py
 ```
+
+### Why This Works
+- Uses data frames (type=2) instead of management frames
+- Includes proper LLC/SNAP headers with custom protocol ID
+- Uses dedicated monitor interface (mon0) for reliable injection
 
 ## Monitor Mode Operations
 
