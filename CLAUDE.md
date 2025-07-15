@@ -205,3 +205,46 @@ from scapy.all import *
 # Interface wlan1 (USB adapter) supports monitor mode
 sniff(iface="wlan1", prn=lambda x: x.summary())
 ```
+
+## Packet Testing
+
+WATR includes a comprehensive packet testing system for validating custom protocol transmission between devices.
+
+### Quick Test Commands
+```bash
+# Simple packet transmission test
+sudo /opt/watr/venv/bin/python test-send.py
+
+# Packet reception test
+sudo /opt/watr/venv/bin/python test-receive.py
+
+# Full coordinator (when working)
+sudo ./test-packets send
+sudo ./test-packets receive
+```
+
+### Test Features
+- **Monitor Mode Integration**: Uses bootstrap-detected monitor-capable adapters
+- **Custom Protocol Packets**: Transmits WATR protocol packets over WiFi
+- **Beacon Frame Embedding**: Embeds WATR data in WiFi beacon frames
+- **Multi-device Testing**: Send on one device, receive on another
+- **Root Privilege Handling**: Properly manages sudo requirements
+
+### Tested Configuration
+```
+📡 Successfully tested on tm11.local:
+   Interface: wlan1 (USB rtl8xxxu)
+   Channel: 6
+   Mode: Monitor
+   Packets: 3 sent successfully
+   
+✓ WATR protocol packets transmitted over WiFi
+✓ Monitor mode setup/teardown working
+✓ Bootstrap integration functional
+```
+
+### Multi-Device Testing Procedure
+1. **Setup both devices**: Run `python bootstrap.py` on each device
+2. **Start receiver**: `sudo /opt/watr/venv/bin/python test-receive.py` on device 1
+3. **Start sender**: `sudo /opt/watr/venv/bin/python test-send.py` on device 2
+4. **Verify transmission**: Check packet counters on both devices
