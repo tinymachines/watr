@@ -60,11 +60,29 @@ class PacketSender:
             # Bring interface up
             subprocess.run(f"sudo ip link set {self.config.interface} up", shell=True, check=True)
             
+            # Wait for interface to be ready
+            print("⏳ Waiting for interface to initialize...")
+            time.sleep(2)
+            
+            # Verify interface is up
+            result = subprocess.run(f"ip link show {self.config.interface}", shell=True, capture_output=True, text=True)
+            if "UP" not in result.stdout:
+                print(f"⚠️  Interface {self.config.interface} is not up after monitor mode setup")
+                # Try to bring it up again
+                subprocess.run(f"sudo ip link set {self.config.interface} up", shell=True, check=True)
+                time.sleep(1)
+            
             # Set channel
             subprocess.run(f"sudo iw dev {self.config.interface} set channel {self.config.channel}", shell=True, check=True)
             
-            print(f"✓ Monitor mode active on {self.config.interface}, channel {self.config.channel}")
-            return True
+            # Final verification
+            result = subprocess.run(f"iw dev {self.config.interface} info", shell=True, capture_output=True, text=True)
+            if "type monitor" in result.stdout:
+                print(f"✓ Monitor mode active on {self.config.interface}, channel {self.config.channel}")
+                return True
+            else:
+                print(f"❌ Monitor mode verification failed")
+                return False
             
         except subprocess.CalledProcessError as e:
             print(f"❌ Failed to set up monitor mode: {e}")
@@ -202,11 +220,29 @@ class PacketReceiver:
             # Bring interface up
             subprocess.run(f"sudo ip link set {self.config.interface} up", shell=True, check=True)
             
+            # Wait for interface to be ready
+            print("⏳ Waiting for interface to initialize...")
+            time.sleep(2)
+            
+            # Verify interface is up
+            result = subprocess.run(f"ip link show {self.config.interface}", shell=True, capture_output=True, text=True)
+            if "UP" not in result.stdout:
+                print(f"⚠️  Interface {self.config.interface} is not up after monitor mode setup")
+                # Try to bring it up again
+                subprocess.run(f"sudo ip link set {self.config.interface} up", shell=True, check=True)
+                time.sleep(1)
+            
             # Set channel
             subprocess.run(f"sudo iw dev {self.config.interface} set channel {self.config.channel}", shell=True, check=True)
             
-            print(f"✓ Monitor mode active on {self.config.interface}, channel {self.config.channel}")
-            return True
+            # Final verification
+            result = subprocess.run(f"iw dev {self.config.interface} info", shell=True, capture_output=True, text=True)
+            if "type monitor" in result.stdout:
+                print(f"✓ Monitor mode active on {self.config.interface}, channel {self.config.channel}")
+                return True
+            else:
+                print(f"❌ Monitor mode verification failed")
+                return False
             
         except subprocess.CalledProcessError as e:
             print(f"❌ Failed to set up monitor mode: {e}")
@@ -242,7 +278,7 @@ class PacketReceiver:
                 ssid_found = False
                 watr_data = None
                 
-                # Parse 802.11 elements
+                # Parse 802.11 elements - fixed iteration
                 elt = packet[Dot11Elt]
                 while elt:
                     if elt.ID == 0 and elt.info == b"WATR-TEST":
@@ -250,15 +286,8 @@ class PacketReceiver:
                     elif elt.ID == 221:  # Vendor-specific element
                         watr_data = elt.info
                     
-                    # Move to next element
-                    if elt.len > 0:
-                        remaining = elt.payload
-                        if len(remaining) > 0:
-                            elt = remaining
-                        else:
-                            break
-                    else:
-                        break
+                    # Move to next element properly
+                    elt = elt.payload if hasattr(elt, 'payload') and isinstance(elt.payload, Dot11Elt) else None
                 
                 if ssid_found and watr_data:
                     # Try to parse WATR packet
@@ -270,6 +299,8 @@ class PacketReceiver:
                         payload_data = "unknown"
                         if watr_packet.haslayer(WATRPayload):
                             payload_data = watr_packet[WATRPayload].data
+                            if isinstance(payload_data, bytes):
+                                payload_data = payload_data.decode('utf-8', errors='replace')
                         
                         self.watr_packets.append({
                             'sequence': self.received_count,
@@ -283,6 +314,7 @@ class PacketReceiver:
                         
                     except Exception as e:
                         print(f"⚠️  Error parsing WATR packet: {e}")
+                        print(f"    Raw data ({len(watr_data)} bytes): {watr_data.hex()}")
                         
         except Exception as e:
             # Ignore parsing errors for non-WATR packets
@@ -303,12 +335,40 @@ class PacketReceiver:
             
             self.running = True
             
-            # Start sniffing (remove filter for now - will filter in handler)
-            sniff(
-                iface=self.config.interface,
-                prn=self.packet_handler,
-                stop_filter=lambda x: not self.running
-            )
+            # Start sniffing with error handling
+            try:
+                sniff(
+                    iface=self.config.interface,
+                    prn=self.packet_handler,
+                    stop_filter=lambda x: not self.running,
+                    store=False  # Don't store packets in memory to prevent memory issues
+                )
+            except OSError as e:
+                if e.errno == 100:  # Network is down
+                    print(f"❌ Network interface error: {e}")
+                    print(f"   The interface may not be ready. Trying alternative method...")
+                    
+                    # Try continuous sniffing with timeout loop
+                    print("   Using timeout-based sniffing loop...")
+                    while self.running:
+                        try:
+                            # Sniff in 1-second intervals
+                            sniff(
+                                iface=self.config.interface,
+                                prn=self.packet_handler,
+                                timeout=1,
+                                store=False
+                            )
+                        except OSError as e2:
+                            if e2.errno == 100:
+                                print(f"   Still having network issues, waiting...")
+                                time.sleep(1)
+                            else:
+                                raise
+                        except KeyboardInterrupt:
+                            break
+                else:
+                    raise
             
             print(f"\n✓ Reception complete! Received {self.received_count} WATR packets")
             return True
@@ -318,6 +378,8 @@ class PacketReceiver:
             return False
         except Exception as e:
             print(f"❌ Error during reception: {e}")
+            import traceback
+            traceback.print_exc()
             return False
         finally:
             self.running = False
