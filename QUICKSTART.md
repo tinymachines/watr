@@ -10,12 +10,19 @@ Get WATR packet transmission working in 5 minutes!
 
 ## Step 1: Setup Monitor Interface (Both Devices)
 
+### Option A: Using Bootstrap (Recommended)
+```bash
+cd /opt/watr
+python bootstrap.py --setup-monitor
+```
+
+### Option B: Using Setup Script
 ```bash
 cd /opt/watr
 sudo ./setup-monitor.sh auto
 ```
 
-This creates a `mon0` interface for packet injection/capture.
+Either method creates a `mon0` interface for packet injection/capture.
 
 ## Step 2: Start Receiver (Device 1)
 

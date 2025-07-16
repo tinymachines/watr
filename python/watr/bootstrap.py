@@ -354,9 +354,98 @@ class AdapterBootstrap:
             print(f"  📶 Bluetooth available on {bt_adapter.interface}")
         
         print("\n" + "="*60)
+    
+    def setup_monitor_interface(self, adapter: WiFiAdapter, interface_name: str = "mon0") -> bool:
+        """Setup a monitor interface for the given adapter"""
+        print(f"\n🔧 Setting up monitor interface {interface_name} on {adapter.phy}...")
+        
+        try:
+            # Remove existing monitor interface if it exists
+            result = self.run_command(f"sudo /usr/sbin/iw dev {interface_name} del", check=False)
+            if result.returncode == 0:
+                print(f"  ✓ Removed existing {interface_name}")
+            
+            # Create monitor interface
+            print(f"  Creating monitor interface...")
+            result = self.run_command(
+                f"sudo /usr/sbin/iw phy {adapter.phy} interface add {interface_name} type monitor",
+                check=False
+            )
+            
+            if result.returncode != 0:
+                print(f"  ❌ Failed to create monitor interface: {result.stderr}")
+                return False
+            
+            # Set frequency to channel 1 (2412 MHz)
+            print(f"  Setting channel 1 (2412 MHz)...")
+            self.run_command(f"sudo /usr/sbin/iw dev {interface_name} set freq 2412", check=False)
+            
+            # Bring interface up
+            print(f"  Bringing interface up...")
+            result = self.run_command(f"sudo ip link set {interface_name} up", check=False)
+            
+            if result.returncode != 0:
+                print(f"  ❌ Failed to bring up interface: {result.stderr}")
+                return False
+            
+            # Verify
+            print(f"  Verifying configuration...")
+            result = self.run_command(f"/usr/sbin/iw dev {interface_name} info", check=False)
+            
+            if result.returncode == 0:
+                print(f"\n✅ Monitor interface {interface_name} successfully created!")
+                print(f"  📡 Interface: {interface_name}")
+                print(f"  📻 Physical device: {adapter.phy}")
+                print(f"  📶 Channel: 1 (2412 MHz)")
+                print(f"  🎯 Ready for packet injection/capture")
+                return True
+            else:
+                print(f"  ❌ Failed to verify interface")
+                return False
+                
+        except Exception as e:
+            print(f"  ❌ Error setting up monitor interface: {e}")
+            return False
+    
+    def find_best_monitor_adapter(self) -> Optional[WiFiAdapter]:
+        """Find the best adapter for monitor mode"""
+        monitor_adapters = [a for a in self.wifi_adapters if a.supports_monitor]
+        
+        if not monitor_adapters:
+            return None
+        
+        # Prefer USB adapters over onboard
+        usb_adapters = [a for a in monitor_adapters if not a.is_onboard]
+        if usb_adapters:
+            return usb_adapters[0]
+        
+        # Otherwise return first monitor-capable adapter
+        return monitor_adapters[0]
 
 def main():
     """Main bootstrap function"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(
+        description="WATR Adapter Bootstrap - Detect and configure wireless adapters"
+    )
+    parser.add_argument(
+        '--setup-monitor',
+        action='store_true',
+        help='Setup monitor interface on best available adapter'
+    )
+    parser.add_argument(
+        '--monitor-interface',
+        default='mon0',
+        help='Name for monitor interface (default: mon0)'
+    )
+    parser.add_argument(
+        '--adapter',
+        help='Specific adapter to use for monitor mode (e.g., wlan1)'
+    )
+    
+    args = parser.parse_args()
+    
     print("🚀 WATR Adapter Bootstrap")
     print("Detecting and configuring wireless adapters...\n")
     
@@ -404,12 +493,89 @@ def main():
         
         print(f"📄 Configuration saved to /tmp/watr_adapters.json")
         
+        # Setup monitor interface if requested
+        if args.setup_monitor:
+            print("\n" + "="*60)
+            print("🔧 MONITOR INTERFACE SETUP")
+            print("="*60)
+            
+            # Find the adapter to use
+            if args.adapter:
+                # User specified adapter
+                adapter = next((a for a in bootstrap.wifi_adapters if a.interface == args.adapter), None)
+                if not adapter:
+                    print(f"❌ Adapter {args.adapter} not found!")
+                    sys.exit(1)
+                if not adapter.supports_monitor:
+                    print(f"❌ Adapter {args.adapter} does not support monitor mode!")
+                    sys.exit(1)
+            else:
+                # Auto-select best adapter
+                adapter = bootstrap.find_best_monitor_adapter()
+                if not adapter:
+                    print("❌ No monitor-capable adapters found!")
+                    print("💡 Try adding a USB WiFi adapter that supports monitor mode")
+                    sys.exit(1)
+            
+            print(f"\n📡 Using adapter: {adapter.interface} ({adapter.phy})")
+            print(f"   Driver: {adapter.driver}")
+            if adapter.usb_id:
+                print(f"   USB ID: {adapter.usb_id}")
+            
+            # Setup monitor interface
+            success = bootstrap.setup_monitor_interface(adapter, args.monitor_interface)
+            
+            if success:
+                print(f"\n🎉 SUCCESS! Monitor interface is ready")
+                print(f"\n📝 Quick test commands:")
+                print(f"   # Check interface status")
+                print(f"   iw dev {args.monitor_interface} info")
+                print(f"\n   # Test packet capture")
+                print(f"   sudo tcpdump -i {args.monitor_interface} -c 10")
+                print(f"\n   # Send WATR packets")
+                print(f"   sudo python -m watr.packet_test_fixed send --interface {args.monitor_interface}")
+                print(f"\n   # Receive WATR packets")
+                print(f"   sudo python -m watr.packet_test_fixed receive --interface {args.monitor_interface}")
+            else:
+                print(f"\n❌ Failed to setup monitor interface")
+                sys.exit(1)
+        
     except KeyboardInterrupt:
         print("\n⚠️  Bootstrap interrupted by user")
         sys.exit(1)
     except Exception as e:
         print(f"\n❌ Bootstrap failed: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
+
+# Convenience functions for use in other modules
+def get_adapter_info() -> Dict:
+    """Get adapter information from saved configuration"""
+    try:
+        with open('/tmp/watr_adapters.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {'wifi_adapters': [], 'bluetooth_adapters': []}
+
+def get_monitor_capable_adapter() -> Optional[str]:
+    """Get the first monitor-capable adapter interface name"""
+    config = get_adapter_info()
+    for adapter in config.get('wifi_adapters', []):
+        if adapter.get('supports_monitor', False):
+            return adapter['interface']
+    return None
+
+def setup_monitor_quick(interface_name: str = "mon0") -> bool:
+    """Quick setup of monitor interface on best available adapter"""
+    bootstrap = AdapterBootstrap()
+    bootstrap.detect_wifi_adapters()
+    
+    adapter = bootstrap.find_best_monitor_adapter()
+    if not adapter:
+        return False
+    
+    return bootstrap.setup_monitor_interface(adapter, interface_name)
 
 if __name__ == "__main__":
     main()

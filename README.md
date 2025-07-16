@@ -107,8 +107,18 @@ This creates a tarball in the `dist/` directory containing all necessary files f
 The bootstrap utility detects and configures wireless adapters:
 
 ```bash
+# Basic detection
 python bootstrap.py
+
+# Detect adapters and setup monitor interface
+python bootstrap.py --setup-monitor
 ```
+
+Features:
+- Automatic adapter detection
+- Monitor mode capability testing
+- **NEW**: Automatic monitor interface setup
+- Best adapter selection (prefers USB over onboard)
 
 Output example:
 ```
@@ -118,6 +128,14 @@ Output example:
 
 📱 Bluetooth Adapters (1 found):
   🔵 hci0 - Onboard Bluetooth
+
+🔧 MONITOR INTERFACE SETUP
+📡 Using adapter: wlan1 (phy3)
+✅ Monitor interface mon0 successfully created!
+  📡 Interface: mon0
+  📻 Physical device: phy3
+  📶 Channel: 1 (2412 MHz)
+  🎯 Ready for packet injection/capture
 ```
 
 ## Packet Testing

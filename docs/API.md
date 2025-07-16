@@ -119,20 +119,38 @@ print(watr_packet[WATRPayload].data)  # "Hello!"
 
 ## Bootstrap API
 
-### Adapter Detection
+### Adapter Detection and Setup
 
 ```python
-from watr.bootstrap import WifiAdapter, Bootstrap
+from watr.bootstrap import AdapterBootstrap, setup_monitor_quick
 
-# Run bootstrap
-bootstrap = Bootstrap()
-bootstrap.run()
+# Full bootstrap with detection and setup
+bootstrap = AdapterBootstrap()
+bootstrap.detect_wifi_adapters()
+bootstrap.detect_bluetooth_adapters()
 
-# Access detected adapters
-for adapter in bootstrap.wifi_adapters:
-    print(f"{adapter.interface}: {adapter.driver}")
-    if adapter.supports_monitor:
-        print("  Supports monitor mode!")
+# Find best monitor adapter
+adapter = bootstrap.find_best_monitor_adapter()
+if adapter:
+    # Setup monitor interface
+    success = bootstrap.setup_monitor_interface(adapter, "mon0")
+
+# Or use quick setup function
+success = setup_monitor_quick("mon0")
+```
+
+### Convenience Functions
+
+```python
+from watr.bootstrap import get_adapter_info, get_monitor_capable_adapter
+
+# Get saved adapter info
+info = get_adapter_info()
+
+# Get first monitor-capable interface
+interface = get_monitor_capable_adapter()
+if interface:
+    print(f"Monitor capable: {interface}")
 ```
 
 ### WifiAdapter Class
@@ -143,7 +161,17 @@ for adapter in bootstrap.wifi_adapters:
 - `driver`: Driver name (e.g., 'rtl8xxxu')
 - `supports_monitor`: Boolean indicating monitor mode support
 - `is_onboard`: Boolean indicating if adapter is built-in
-- `mac_address`: Hardware MAC address
+- `usb_id`: USB vendor:product ID if applicable
+- `rfkill_id`: RFKill ID for the adapter
+
+### AdapterBootstrap Methods
+
+- `detect_wifi_adapters()`: Detect all WiFi adapters
+- `detect_bluetooth_adapters()`: Detect Bluetooth adapters
+- `test_monitor_mode(interface)`: Test if interface supports monitor
+- `setup_monitor_interface(adapter, name)`: Create monitor interface
+- `find_best_monitor_adapter()`: Auto-select best adapter for monitor mode
+- `unblock_adapters()`: Unblock all wireless adapters via rfkill
 
 ## Packet Testing API
 

@@ -158,17 +158,23 @@ WATR includes a bootstrap utility to detect and configure WiFi and Bluetooth ada
 
 ### Bootstrap Command
 ```bash
-# Run adapter detection and configuration
+# Basic adapter detection
 python bootstrap.py
 
-# Or with virtual environment
-source venv/bin/activate
-python bootstrap.py
+# Detection + automatic monitor interface setup
+python bootstrap.py --setup-monitor
+
+# Setup monitor with custom interface name
+python bootstrap.py --setup-monitor --monitor-interface mon1
+
+# Use specific adapter for monitor mode
+python bootstrap.py --setup-monitor --adapter wlan1
 ```
 
 ### Adapter Detection Features
 - **WiFi Adapters**: Detects onboard and USB WiFi adapters
 - **Monitor Mode Testing**: Practical testing of monitor mode capabilities
+- **Monitor Interface Setup**: Automatic creation of monitor interface
 - **Bluetooth Detection**: Identifies Bluetooth adapters
 - **RFKill Management**: Automatically unblocks wireless adapters
 - **Configuration Export**: Saves adapter info to JSON for other tools
