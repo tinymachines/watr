@@ -1,0 +1,16 @@
+# Compiled binaries
+send-test
+receive-test
+
+# Object files
+*.o
+*.obj
+
+# Temporary files
+*.tmp
+*~
+
+# Build artifacts
+*.a
+*.so
+*.dylib

@@ -301,3 +301,56 @@ sudo /opt/watr/venv/bin/python test-watr-receive.py
 
 ### Original Working Code Reference
 The solution is based on working code from `protoc/custom.py` which successfully transmits packets between devices using this approach.
+
+## C/C++ Implementation
+
+WATR now includes a lightweight C++ implementation optimized for embedded systems and OpenWRT routers.
+
+### C++ Protocol Tools
+Located in `protoc/` directory:
+
+```bash
+# Build the tools
+cd protoc
+make
+
+# Test on devices
+sudo ./send-test mon0      # Transmitter
+sudo ./receive-test mon0   # Receiver
+```
+
+### Key Features
+- **Zero dependencies**: Only standard C/C++ libraries
+- **Memory efficient**: Static allocation, ~50KB footprint
+- **OpenWRT ready**: Cross-compilation support
+- **Raw socket implementation**: Direct 802.11 injection
+- **Compatible with Python version**: Same packet format
+
+### Packet Structure (C++)
+```c
+struct watr_packet {
+    struct radiotap_header radiotap;  // 8 bytes
+    struct ieee80211_hdr wifi;        // 24 bytes
+    struct llc_header llc;            // 3 bytes
+    struct snap_header snap;          // 5 bytes
+    struct watr_header watr;          // 16 bytes
+    uint8_t payload[1024];            // Variable
+};
+```
+
+### Cross-Compilation for OpenWRT
+```bash
+export CROSS_COMPILE=mipsel-openwrt-linux-
+export TARGET_ARCH=mips32r2
+cd protoc && make clean && make
+```
+
+### Deployment to Routers
+```bash
+# Copy to router
+scp {send,receive}-test root@router:/tmp/
+
+# Run on router
+ssh root@router
+/tmp/receive-test wlan1  # Monitor-capable interface
+```
