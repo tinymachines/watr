@@ -1,10 +1,11 @@
 #!/bin/bash
 
 function hw_reset() {
-	sudo ifconfig mon0 down
-	sudo rfkill unblock all
-	sudo airmon-ng check kill
-	sudo systemctl restart NetworkManager
+        sudo raspi-config nonint do_wifi_country XX
+        sudo rfkill unblock all
+        sudo ifconfig mon0 down
+        sudo airmon-ng check kill
+        sudo systemctl restart NetworkManager
 }
 
 function init_mon() {

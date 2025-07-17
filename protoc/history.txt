@@ -1,0 +1,836 @@
+    1  sudo apt-get update && sudo apt-get upgrade -y
+    2  sudo reboot now
+    3  sudo apt-get install network-tools build-essential
+    4  sudo apt-get install nbuild-essential
+    5  sudo apt-get install build-essential
+    6  sudo apt-get install openssh-server 
+    7  ifconfig
+    8  sudo raspi-config 
+    9  sudo reboot now
+   10  htop
+   11  df -h
+   12  lsblk
+   13  df -h
+   14  df
+   15  lsblk
+   16  df
+   17  exit
+   18  ls -la
+   19  vim setup.sh 
+   20  sudo apt-get install vim
+   21  sudo apt-get installiwlist
+   22  sudo apt-get install iwlist
+   23  sudo apt-get update && sudo apt-get install -y net-tools iproute2 iputils-ping ethtool nmap tcpdump wireshark netcat-openbsd mtr iperf3 dnsutils whois traceroute iftop nethogs nload openssh-client openssh-server rsync curl wget sshfs
+   24  vim setup.sh 
+   25  sudo apt-get install llvm clang
+   26  sudo apt-get install llvm-19 clang-19
+   27  vim setup.sh 
+   28  ./setup.sh install_nvm
+   29  vim setup.sh 
+   30  ./setup.sh install_go
+   31  exit
+   32  go --version
+   33  npm  --version
+   34  node --version
+   35  vim  setup.sh 
+   36  vim ~/.bashrc 
+   37  source ~/.bashrc 
+   38  nvm
+   39  npm
+   40  node
+   41  npx
+   42  node
+   43  vim setup.sh 
+   44  nvm install 22
+   45  which node
+   46  vim ~/.bashrc 
+   47  exit
+   48  node
+   49  npm
+   50  vim setup.sh 
+   51  ./setup.sh install_pyenv
+   52  vim setup.sh 
+   53  ls 
+   54  mkdir lib
+   55  ./setup.sh install_pyenv
+   56  sudo apt-get install git
+   57  exit
+   58  vim setup.sh 
+   59  ./setup.sh install_pyenv
+   60  vim setup.sh 
+   61  ./setup.sh first_time
+   62  ./setup.sh install_pyenv
+   63  exit
+   64  pyenv activate tinmac 
+   65  ./setup.sh install_ollama
+   66  ollama
+   67  ls /home/bisenbek/lib/ollama/ollama
+   68  ls /home/bisenbek/lib/ollama
+   69  cd lib/
+   70  ls
+   71  cd ollama/
+   72  ls
+   73  mkdir build
+   74  cd build/
+   75  cmake ..
+   76  lpmake
+   77  make
+   78  ls
+   79  cd ..
+   80  ls
+   81  go build
+   82  screen -x
+   83  ollama serve
+   84  ollama
+   85  ollama list
+   86  screen
+   87  ollama list
+   88  ollama pull deepseek-r1:1.5b
+   89  ollama run deepseek-r1:1.5b
+   90  htop
+   91  ifconfig
+   92  ls -la
+   93  llvm
+   94  sudo shuTdown now
+   95  sudo shutdown now
+   96  cd lib
+   97  ls -la
+   98  htop
+   99  git clone https://github.com/ggml-org/llama.cpp.git
+  100  which clang-19 
+  101  sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang
+  102  sudo update-alternatives --install /usr/bin/clang-19 clang /usr/bin/clang
+  103  sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-19
+  104  sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-19 100
+  105  sudo update-alternatives --install /usr/bin/clang++-19 clang++ /usr/bin/clang++ 100
+  106  sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-19 100
+  107  sudo update-alternatives --install /usr/bin/clang-cpp clang-cpp /usr/bin/clang-cpp-19 100
+  108  which ldd
+  109  ldd --verion
+  110  cd llama.cpp/
+  111  ls -la
+  112  cmake -B build
+  113  cmake --build build --config Release -j 4
+  114  ls -la
+  115  cd build/
+  116  ls -la
+  117  cd bin/
+  118  ls
+  119  ls -la
+  120  ls | sort
+  121  ./llama-qwen2vl-cli 
+  122  ./llama-cvector-generator 
+  123  cd ~/lib/
+  124  cd ../models/
+  125  ls
+  126  wget "https://huggingface.co/unsloth/DeepSeek-R1-Distill-Qwen-1.5B-GGUF/resolve/main/DeepSeek-R1-Distill-Qwen-1.5B-Q8_0.gguf?download=true"
+  127  ls -la
+  128  mv 'DeepSeek-R1-Distill-Qwen-1.5B-Q8_0.gguf?download=true' ./deepseek-r1-distill-qwen-1.5B-Q8.gguf
+  129  ls -la
+  130  ls -lahtr
+  131  vim test.hs
+  132  vim test.sh
+  133  chmod +x test.sh 
+  134  ls
+  135  cd ../lib/
+  136  ls
+  137  mv ../models/test.sh 
+  138  mv ../models/test.sh .
+  139  vim test.sh 
+  140  ls llama.cpp/
+  141  cd bi
+  142  ls
+  143  cd llama.cpp
+  144  ls 
+  145  cd build/
+  146  ls
+  147  cd bin/
+  148  ls -la
+  149  pwd
+  150  export PATH="${PATH}:/home/bisenbek/lib/llama.cpp/build/bin"
+  151  cd ..
+  152  ls -la
+  153  cd ..
+  154  vim test.sh 
+  155  ./test.sh ~/models/deepseek-r1-distill-qwen-1.5B-Q8.gguf 
+  156  git clone https://github.com/tinygrad/tinygrad.git
+  157  pyenv activate tinmac 
+  158  python --version
+  159  ls -la
+  160  cd tinygrad
+  161  ls -la
+  162  cd ti
+  163  vim ruff.toml 
+  164  ls -la
+  165  vim setup.py 
+  166  python -m pip install .
+  167  export PYTHONPATH="."
+  168  python examples/transformer.py 
+  169  grep -R require *
+  170  grep -R requirements
+  171  grep -R requi*
+  172  ls -la
+  173  cd tinygrad.egg-info/
+  174  ls -la
+  175  vim requires.txt 
+  176  cp requires.txt ../requirements.txt
+  177  cd ..
+  178  python -m pip install -r requirements
+  179  python -m pip install -r requirements.txt
+  180  python examples/transformer.py 
+  181  python -m pip install numpy
+  182  python examples/transformer.py 
+  183  s
+  184  ls
+  185  cd tinygrad
+  186  ls
+  187  vim tensor.py 
+  188  vim engine/schedule.py 
+  189  grep -R DEBUG *
+  190  grep -R DEBUG * | more
+  191  grep -R 'DEBUG=' * | more
+  192  grep -R 'getenv' * | more
+  193  grep -R 'getenv' * | grep -Eop
+  194  grep -R 'getenv' * | grep -Eo
+  195  grep -R 'getenv' * | grep -Eo 'getenv'
+  196  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv'
+  197  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[(]'
+  198  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]'
+  199  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(][A-Z]*'
+  200  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(][AZ]*'
+  201  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(][A-Z ]*'
+  202  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(][A-Z a-z]*'
+  203  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(] *'
+  204  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]  *'
+  205  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(] '
+  206  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]'
+  207  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(][A-Z]{1,}'
+  208  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(][A-Za-z ]{1,}'
+  209  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["]'
+  210  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9]{1,}'
+  211  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9]{1,}["]'
+  212  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv [ ]{0,}[(]["][A-Za-z0-9]{1,}["]'
+  213  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,} [(]["][A-Za-z0-9]{1,}["]'
+  214  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv [ ]{0,}[(]["][A-Za-z0-9]{1,}["]'
+  215  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,} [(]["][A-Za-z0-9]{1,}["]'
+  216  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9]{1,}["]'
+  217  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9]{1,}["]' | sort | uniq
+  218  grep -R 'getenv' * 2> /dev/null | mre
+  219  grep -R 'getenv' * 2> /dev/null | more
+  220  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9]{1,}["]' | sort | uniq
+  221  grep -R 'getenv' * 2> /dev/null | more
+  222  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9_]{1,}["]' | sort | uniq
+  223  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9_]{1,}["][)]' | sort | uniq
+  224  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9_]{1,}["]' | sort | uniq
+  225  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9_]{1,}["]' | sort | uniq | while read -r ROW; do echo "${ROW}"; done
+  226  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9_]{1,}["]' | sort | uniq | while IFS='"' read -ra ROW; do echo "${ROW[1]}"; done
+  227  grep -R 'getenv' * 2> /dev/null | grep -Eo 'getenv[ ]{0,}[(]["][A-Za-z0-9_]{1,}["]' | sort | uniq | while IFS='"' read -ra ROW; do echo "${ROW[1]}"; done > envs.txt
+  228  vim getenvs.sh
+  229  vim envs.txt 
+  230  grep -R 'FLOAT16' *
+  231  FLOAT16=0 python examples/transformer.py
+  232  cd ..
+  233  FLOAT16=0 python examples/transformer.py
+  234  FLOAT16=FALSE python examples/transformer.py
+  235  mv tinygrad/getenvs.sh .
+  236  mv tinygrad/envs.txt .
+  237  chmod +x getenvs.sh 
+  238  ./getenvs.sh 
+  239  vim envs.txt 
+  240  BFLOAT16=FALSE python examples/transformer.py
+  241  BFLOAT16=1 python examples/transformer.py
+  242  ls /mnt/
+  243  ls /media/
+  244  vim runnit.sh
+  245  chmod +x ./runnit.sh 
+  246  vim runnit.sh
+  247  ./runnit.sh 
+  248  vim runnit.sh 
+  249  vim envs.txt 
+  250  vim runnit.sh 
+  251  vim envs.txt 
+  252  vim runnit.sh 
+  253  vim envs.txt 
+  254  vim runnit.sh 
+  255  ./runnit.sh 
+  256  vim runnit.sh 
+  257  ./runnit.sh 
+  258  vim runnit.sh 
+  259  ./runnit.sh 
+  260  vim envs.txt 
+  261  vim runnit.sh 
+  262  vim envs.txt 
+  263  ./runnit.sh 
+  264  vim envs.txt 
+  265  vim ru
+  266  vim runnit.sh 
+  267  vim ru
+  268  ./runnit.sh 
+  269  vim ru
+  270  vim runnit.sh 
+  271  vim ru
+  272  ./runnit.sh 
+  273  vim ru
+  274  vim runnit.sh 
+  275  vim ru
+  276  ./runnit.sh 
+  277  vim /home/bisenbek/lib/tinygrad/tinygrad/tensor.py
+  278  ./runnit.sh 
+  279  vim /home/bisenbek/lib/tinygrad/tinygrad/tensor.py
+  280  ./runnit.sh 
+  281  vim envs.txt 
+  282  vim /home/bisenbek/lib/tinygrad/tinygrad/tensor.py
+  283  ./runnit.sh 
+  284  vim /home/bisenbek/lib/tinygrad/tinygrad/tensor.py
+  285  vim ./runnit.sh 
+  286  ./runnit.sh 
+  287  vim ./runnit.sh 
+  288  ./runnit.sh 
+  289  vim ./runnit.sh 
+  290  sudo shutdown now
+  291  Mangosudo apt-get update && sudo apt-get install -y net-tools iproute2 iputils-ping ethtool nmap tcpdump wireshark netcat-openbsd mtr iperf3 dnsutils whois traceroute iftop nethogs nload openssh-client openssh-server rsync curl wget sshfs
+  292  sudo raspi-config 
+  293  sudo reboot now
+  294  echo -n | sudo tee /etc/machine-id
+  295  sudo reboot now
+  296  cat /etc/machine-id 
+  297  ls -alhtr /etc/machine-id 
+  298  exit
+  299  sudo visudo
+  300  sudo reboot now
+  301  ls ~/.ssh/
+  302  cat ~/.ssh/
+  303  cat ~/.ssh/authorized_keys 
+  304  vim ~/.ssh/authorized_keys 
+  305  exit
+  306  sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get autoremove -y && sudo reboot now
+  307  echo -n | sudo tee /etc/machine-id
+  308  sudo reboot now
+  309  ssh tm04
+  310  exi
+  311  exit
+  312  ln -s /home/bisenbek/home/bisenbek/shared ~/shared
+  313  cd shared
+  314  ls -al
+  315  cd xfer/
+  316  ls
+  317  cd services/
+  318  ls -la
+  319  sudo ./init.sh 
+  320  sudo systemctl status tinmac.proton.service 
+  321  sudo ifconfig wlan0 down
+  322  exit
+  323  sudo apt-get install chromium chromium*
+  324  sudo apt-get list chromium
+  325  sudo apt-get
+  326  sudo apt-config 
+  327  sudo apt-config dump
+  328  sudo apt search
+  329  sudo apt list chrom
+  330  sudo apt list chrom*
+  331  sudo apt list chrom* n
+  332  sudo apt list help
+  333  sudo apt list --help
+  334  cd shared
+  335  l s-la
+  336  ls- la
+  337  ls -la
+  338  cd spydr/
+  339  ls-la
+  340  cd scripts/
+  341  l s-la
+  342  ls -la
+  343  vim showpax.sh
+  344  chmod +x ./showpax.sh 
+  345  ./showpax.sh 
+  346  vim showpax.sh
+  347  sudo apt list chrom*
+  348  sudo apt list chromi*
+  349  history | grep apt
+  350  sudo apt search chrom(
+  351  sudo apt search chrom*
+  352  sudo apt list chrom*
+  353  sudo apt list chro*
+  354  ssh tm10
+  355  sudo systemctl status syncthing@bisenbek.service
+  356  ifconfig
+  357  cd shared/spydr/v2/
+  358  ls -la
+  359  cd logs/
+  360  l s-la
+  361  ls -la
+  362  cd tm10
+  363  cat clean.lnk 
+  364  touch *
+  365  sudo systemctl restart syncthing@bisenbek.service
+  366  sudo systemctl status syncthing@bisenbek.service
+  367  sudo reboot now
+  368  exit
+  369  ssh tm01.locla
+  370  ssh tm01.local
+  371  ssh tm11.local
+  372  exit
+  373  cd /shared
+  374  cd ~/shared
+  375  ls -la
+  376  ls ~/sync/vpn/
+  377  cd vpn
+  378  ls -la
+  379  cp -R ~/sync/vpn/* .
+  380  ls -al
+  381  sudo systemctl restart tinmac.proton.service 
+  382  sudo systemctl status tinmac.proton.service 
+  383  ifconfig
+  384  sudo systemctl status tinmac.proton.service 
+  385  sudo systemctl stop tinmac.proton.service 
+  386  ls -la
+  387  cat pass.txt 
+  388  sudo systemctl start tinmac.proton.service 
+  389  sudo systemctl status tinmac.proton.service 
+  390  ifconfig
+  391  sudo systemctl status tinmac.proton.service 
+  392  ifconfig
+  393  sudo apt-get install openvpn
+  394  ifconfig
+  395  sudo systemctl stop tinmac.proton.service 
+  396  ks 0ak
+  397  ls -al
+  398  ls ~/sync/vpn/pass.txt 
+  399  cat  ~/sync/vpn/pass.txt 
+  400  l s-la
+  401  ls -la  ~/sync/vpn/pass.txt 
+  402  ls -la pass.txt 
+  403  sudo systemctl daemon-reload 
+  404  sudo systemctl start tinmac.proton.vpn
+  405  sudo systemctl start tinmac.proton.ser
+  406  sudo systemctl status tinmac.proton.service 
+  407  sudo systemctl stop tinmac.proton.service 
+  408  sudo systemctl start tinmac.proton.service 
+  409  sudo systemctl status tinmac.proton.service 
+  410  ifconfig
+  411  sudo reboot now
+  412  ifconfig
+  413  exit
+  414  sudo ufw status
+  415  exit
+  416  ifconfig
+  417  sudo systemctl restart tinmac.openvpn.service 
+  418  ifconfig
+  419  ping google.com
+  420  exit
+  421  sudo systemctl status tinmac.openvpn.service 
+  422  ifconfig
+  423  sudo systemctl restart tinmac.openvpn.service 
+  424  ifconfig
+  425  exit
+  426  sudo rfkill
+  427  exit
+  428  sudo shutdown now
+  429  sudo rfkill
+  430  ls -la
+  431  find . -type f | grep -E "[.]sh$" | xargs grep tcpump
+  432  exit
+  433  sudo /opt/watr/venv/bin/python test-watr-receive.py
+  434  cd op
+  435  cd /opt/
+  436  cd watr/
+  437  ls -la
+  438  clear
+  439  sudo ./venv/bin/python ./test-send.py
+  440  cd opt
+  441  cd /opt/
+  442  ifconfig
+  443  cd watr/
+  444  ls -la
+  445  ./venv/bin/python ./test-receive.py 
+  446  sudo ./venv/bin/python ./test-receive.py 
+  447  sudo tcpdump
+  448  sudo tcpdump -vvv -n -i wlx842096fbfd0b -e
+  449  sudo ./venv/bin/python ./test-send.py 
+  450  ls -la
+  451  cd protoc/
+  452  ls -la
+  453  sudo ../venv/bin/python ./hush.py 
+  454  ifconfig
+  455  vim hush.py 
+  456  sudo ../venv/bin/python ./hush.py 
+  457  vim hush.py 
+  458  sudo ../venv/bin/python ./hush.py 
+  459  sudo tcpdump -vvv -n -i wlx842096fbf
+  460  sudo tcpdump -vvv -n -i wlx842096fbfd0b 
+  461  ifconfig
+  462  sudo rfkill 
+  463  l s=-la
+  464  ls -al
+  465  cd lib
+  466  ls -la
+  467  cd ..
+  468  ls -la
+  469  exit
+  470  lsusb
+  471  cd op
+  472  cd /opt/watr/
+  473  clear
+  474  l s-la
+  475  lsd -al
+  476  ls -la
+  477  cd protoc/
+  478  ./build-wifi-monitor-check.sh 
+  479  ls -la
+  480  ././build-wifi-monitor-check.sh 
+  481  ls -la
+  482  sudo ./wifi-monitor-setup 
+  483  sudo ./wifi-monitor-setup phy1
+  484  ifconfig
+  485  sudo ./wifi-monitor-setup phy0
+  486  ifconfig
+  487  cd ..
+  488  clar
+  489  clear
+  490  l s-la
+  491  ls -al
+  492  cd scapy/
+  493  cd ..
+  494  cd examples/
+  495  ls
+  496  cd ..
+  497  ls *.py
+  498  ls -lahtr
+  499  vim test-watr-send.py 
+  500  vim test-receive.py 
+  501  ./venv/bin/python ./test-receive.py 
+  502  sudo ./venv/bin/python ./test-receive.py mon0
+  503  ifconfig
+  504  vim test-receive.py 
+  505  q
+  506  python ./set
+  507  cd src/
+  508  ls
+  509  cd ..
+  510  ls -a
+  511  vim setup-monitor.sh 
+  512  l s-la
+  513  ls -al
+  514  sudo ./setup-monitor.sh 
+  515  ifconfig
+  516  PYTHONPATH="./src" sudo python -m watr.packet_test_fixed receive
+  517  ls
+  518  cd src/
+  519  PYTHONPATH="./src" sudo python -m watr.packet_test_fixed receive
+  520  ls -la
+  521  c ..
+  522  ls -al
+  523  cd ..
+  524  ls -la
+  525  cd python/
+  526  ls -la
+  527  sudo python -m watr.packet_test_fixed receive
+  528  sudo ../venv/bin/python -m watr.packet_test_fixed receive
+  529  pyenv activate tinmac 
+  530  which python
+  531  sudo -E /home/bisenbek/.pyenv/shims/python -m watr.packet_test_fixed receive
+  532  python -m pip install -e scapy
+  533  python -m pip install scapy
+  534  /home/bisenbek/.pyenv/shims/python -m watr.packet_test_fixed receive
+  535  python -m watr.packet_test_fixed receive
+  536  python --version
+  537  python -m pip install scapy
+  538  pip install scapy
+  539  ls
+  540  grep "Scapy not available" *
+  541  grep -R "Scapy not available" *
+  542  py3clean .
+  543  sudo py3clean .
+  544  ls
+  545  grep -R "Scapy not available" *
+  546  vim watr/packet_test.py 
+  547  python -m pip install scapy
+  548  python -m watr.packet_test_fixed receive
+  549  PYTHONPATH="." python -m watr.packet_test_fixed receive
+  550  grep -R "Scapy not available" *
+  551  vim watr/packet_test_fixed.py 
+  552  PYTHONPATH="." python -m watr.packet_test_fixed receive
+  553  ls
+  554  cd ..
+  555  l s-la
+  556  ls -al
+  557  cd scapy/
+  558  ls -la
+  559  git pull
+  560  python -m pip install -e .
+  561  cd ..
+  562  PYTHONPATH="." python -m watr.packet_test_fixed receive
+  563  cd python/
+  564  PYTHONPATH="." python -m watr.packet_test_fixed receive
+  565  grep -R "Scapy not available" *
+  566  vim watr/packet_test_fixed.py 
+  567  cd ..
+  568  vim test-import.sh
+  569  mv test-import.sh test-import.py
+  570  python test-import.py 
+  571  exit
+  572  git clone git@github.com:tinymachines/watr.git
+  573  cd watr/
+  574  ./build_protoc.sh --install-deps
+  575  cd build
+  576  ls
+  577  cd protoc/
+  578  ls
+  579  ./wifi-monitor-check 
+  580  ./wifi-monitor-setup
+  581  ./wifi-monitor-setup PHY0
+  582  ifconfig
+  583  e it
+  584  exit
+  585  ls
+  586  cd watr
+  587  cd pro
+  588  git pull
+  589  make
+  590  cd protoc/
+  591  make
+  592  ./send-test 
+  593  sudo ./send-test mon0
+  594  ifcnfig
+  595  ifconfig
+  596  sudo ./send-test wlx842096fbfd0b
+  597  sudo ./send-test
+  598  sudo ./send-test mon0 00:00
+  599  sudo ./send-test wlx842096fbfd0b 00:00:00:00:00:00
+  600  exit
+  601  cd watr
+  602  git pull
+  603  cd protoc
+  604  make clean
+  605  make
+  606  sudo ./se
+  607  sudo ./receive-test 
+  608  sudo ./receive-test mon0
+  609  exit
+  610  cd watr/
+  611  git pull && make clean && make
+  612  sudo ./receive-test mon0
+  613  cd protoc
+  614  git pull && make clean && make
+  615  exit
+  616  cd watr/
+  617  cd protoc/
+  618  cd watr/
+  619  sudo ./receive-test mon0
+  620  cd watr
+  621  cd protoc
+  622  ls-la
+  623  ls -la
+  624  vun cchitory
+  625  history
+  626  cd ..
+  627  vim build_protoc.sh 
+  628  gitpull &&./build_protoc.sh 
+  629  git pull &&./build_protoc.sh 
+  630  ls protoc/
+  631  ls -lahtr protoc/
+  632  vim build
+  633  cd protoc
+  634  vim build.sh 
+  635  ./build
+  636  ./build.sh 
+  637  sudo /tmp/receive-test mon0
+  638  sudo ./receive-test mon0
+  639  ps aux | grep test
+  640  clear
+  641  sudo ./sen-test mon0
+  642  sudo ./send-test mon0
+  643  sudo ./receive-test mon0
+  644  sudo ./receive-test mon0 5
+  645  git pull && ./build.sh 
+  646  sudo ./receive-test mon0 5
+  647  git pull
+  648  sudo ./send-test mon0
+  649  sudo ./receive-test mon0 5
+  650  ls -la
+  651  ls -lahtr
+  652  vim receive-test
+  653  vim receive-test.cpp 
+  654  sudo ./send-test mon0
+  655  sudo tcpdump -vvv -n -i mon0 -e
+  656  lsusb
+  657  sudo reboot now
+  658  cd watr/protoc/
+  659  sudo ./send-test mon0
+  660  vin send-test.cpp 
+  661  vim send-test.c
+  662  vim send-test.cpp
+  663  sudo ./send-test mon0
+  664  vim send-test.cpp 
+  665  ls
+  666  vim custom.py 
+  667  python custom.py 
+  668  ls ..
+  669  cd ..
+  670  ls
+  671  python ./test-watr-receive-fixed.py 
+  672  ./test-packets 
+  673  sudo ./test-packets send
+  674  ls -lahtr
+  675  cd protoc/
+  676  ls
+  677  ls *.cpp
+  678  make
+  679  ls -lahtr
+  680  wim watr_protocol.cpp 
+  681  vim watr_protocol.cpp 
+  682  vim send-test.cpp 
+  683  cat hush.sh 
+  684  vim networking.sh 
+  685  exit
+  686  lsusb
+  687  cd watr/
+  688  cd protoc/
+  689  ./wifi-monitor-check 
+  690  sudo ./wifi-monitor-setup phy0
+  691  suo rfkill
+  692  sudo rkkill
+  693  sudo rfkill
+  694  sudo ./wifi-monitor-check 
+  695  sudo ./wifi-monitor-check phy0
+  696  sudo ./wifi-monitor-setup phy0
+  697  ifconfig
+  698  cd ..
+  699  cat .git/config 
+  700  cd protoc/
+  701  ./dumpit.sh 
+  702  ls
+  703  cd watt
+  704  cd wate
+  705  history
+  706  exit
+  707  sudo tcpdump -vvv -n -i mon0 -s0 -X -c 1000 | grep -vE "Elise|salami"
+  708  exit
+  709  clear
+  710  ifconfig
+  711  sudo vim /etc/NetworkManager/NetworkManager.conf
+  712  sudo systemctl restart NetworkManager
+  713  sudo airmon-ng check kill
+  714  sudo apt-get install airmon-ng
+  715  cd projects/
+  716  git clone https://github.com/aircrack-ng/aircrack-ng.git
+  717  cd aircrack-ng/
+  718  ls -la
+  719  ./autogen.sh 
+  720  ls -la
+  721  ./config
+  722  ./configure 
+  723  locate openssl
+  724  locate openssl | grep dev
+  725  locate openssl | grep lib
+  726  clear
+  727  make
+  728  vim Makefile
+  729  sudo make install
+  730  cd ~/watr/protoc/
+  731  ls -la
+  732  sudo airmon-ng check kill
+  733  ifconfig
+  734  sudo rfkill
+  735  ls *.sh
+  736  ls -la *.sh
+  737  mv ~/projects/aircrack-ng .
+  738  vim .gitignore 
+  739  git status
+  740  ls *.sh
+  741  ls -la *.sh
+  742  vim init.sh
+  743  chmod +x init.sh 
+  744  mv init.sh reset.sh
+  745  ./reset.sh 
+  746  vim init.sh
+  747  vim reset.sh 
+  748  vim init.sh
+  749  ./reset.sh 
+  750  vim init.sh
+  751  vim reset.sh 
+  752  vim init.sh
+  753  ./reset.sh 
+  754  vim init.sh
+  755  vim reset.sh 
+  756  ./re
+  757  ./reset.sh 
+  758  ifconfiog
+  759  ifconfig
+  760  vim reset.sh 
+  761  ./reset.sh 
+  762  ifconfig
+  763  clear
+  764  ifconfig
+  765  clear
+  766  sudo aireplay-ng --test mon0
+  767  sudo ldconfig 
+  768  sudo aireplay-ng --test mon0
+  769  vim dumpit.sh 
+  770  ./dumpit.sh 
+  771  sudo aireplay-ng --test mon0
+  772  vim reset
+  773  vim reset.sh 
+  774  sudo iw dev wlan0 interface add mon0 type monitor
+  775  sudo iw dev wlan0 interface remove mon0 type monitor
+  776  sudo iw dev wlan0 interface remove mon0
+  777  sudo iw dev wlan0 interface dedlete mon0
+  778  sudo iw dev wlan0 interface delete mon0
+  779  sudo iw dev wlan0 interface del mon0
+  780  sudo iw dev wlan0 interface
+  781  sudo iw dev wlan0 interface | more
+  782  sudo iw dev wlan0 interface | grep down
+  783  sudo iw dev wlan0 interface | grep remove
+  784  sudo iw dev wlan0 interface | grep delete
+  785  sudo iw dev wlan0 interface | grep rm
+  786  ifconfig
+  787  sudo ifconfig down mon0
+  788  sudo ifconfig mon0 down
+  789  ifconfig
+  790  sudo vim reset.sh 
+  791  ./reset.sh 
+  792  ifconfig
+  793  sudo iw dev wlan0 interface add mon0 type monitor
+  794  ifconfig
+  795  vim reset.sh 
+  796  ./reset.sh 
+  797  ifconfig
+  798  ./dumpit.sh 
+  799  vim reset.sh 
+  800  ./dumpit.sh 
+  801  vim reset.sh 
+  802  ./re
+  803  ./reset.sh 
+  804  sudo apt update
+  805  echo "options usbcore autosuspend=-1" | sudo tee /etc/modprobe.d/usb-autosuspend.conf
+  806  sudo apt install mdk4
+  807  l s-la
+  808  ls-al
+  809  ls -la
+  810  ./test-debug.sh 
+  811  ls -la
+  812  ./dumpit.sh 
+  813  ./send-test 
+  814  suo ./send-test mon0
+  815  sudo ./send-test mon0
+  816  git status
+  817  git pull
+  818  git ad ../build_protoc.sh
+  819  git add ../build_protoc.sh
+  820  git add .gitignore 
+  821  git add dumpit.sh 
+  822  git commit -m 'Added tools'
+  823  git config --global user.email "bisenbek@gmail.com"
+  824  git config --global user.name "Bradley S. Isenbek"
+  825  git commit -m 'Added tools'
+  826  git puhs
+  827  git push
+  828  git status
+  829  git add reset.sh 
+  830  git commit -m 'Added tools'
+  831  git push
+  832  ./reset.sh 
+  833  lsusb
+  834  sudo ./receive-test mon0
+  835  ./dumpit.sh 
+  836  history > ./history.txt
