@@ -56,13 +56,14 @@ class PacketSender:
         if not SCAPY_AVAILABLE:
             raise RuntimeError("Scapy not available for packet creation")
         
-        # Create WATR protocol packet
-        watr_packet = WATRHeader(
-            type=0x5741,  # 'WA' in hex
-            length=len(self.config.payload)
-        ) / WATRPayload(
-            data=f"{self.config.payload} #{sequence}"
-        )
+        # Create WATR protocol packet manually for consistency
+        import struct
+        payload_text = f"{self.config.payload} #{sequence}"
+        watr_type = 0x5741  # 'WA'
+        watr_length = len(payload_text)
+        
+        # Pack as: type (2 bytes) + length (4 bytes) + payload
+        watr_data = struct.pack('>HI', watr_type, watr_length) + payload_text.encode('utf-8')
         
         # Create 802.11 data frame
         dot11 = Dot11(
@@ -88,7 +89,6 @@ class PacketSender:
         )
         
         # Combine all layers
-        watr_data = bytes(watr_packet)
         packet = RadioTap() / dot11 / llc / snap / Raw(load=watr_data)
         
         return packet
@@ -164,30 +164,59 @@ class PacketReceiver:
                 if packet.haslayer(Raw):
                     raw_data = packet[Raw].load
                     
-                    # Try to parse WATR packet
+                    # Parse WATR packet manually to handle structure mismatch
                     try:
-                        watr_packet = WATRHeader(raw_data)
-                        self.received_count += 1
-                        
-                        # Extract payload
-                        payload_data = "unknown"
-                        if watr_packet.haslayer(WATRPayload):
-                            payload_data = watr_packet[WATRPayload].data
-                            if isinstance(payload_data, bytes):
-                                payload_data = payload_data.decode('utf-8', errors='replace')
-                        
-                        self.watr_packets.append({
-                            'sequence': self.received_count,
-                            'timestamp': time.time(),
-                            'type': watr_packet.type,
-                            'length': watr_packet.length,
-                            'payload': payload_data,
-                            'src_mac': packet[Dot11].addr2,
-                            'dst_mac': packet[Dot11].addr1
-                        })
-                        
-                        print(f"📥 Received WATR packet #{self.received_count}: {payload_data}")
-                        print(f"   From: {packet[Dot11].addr2} -> {packet[Dot11].addr1}")
+                        # Expected format: type (2 bytes) + length (4 bytes) + payload
+                        if len(raw_data) >= 6:
+                            import struct
+                            # Unpack header
+                            watr_type, watr_length = struct.unpack('>HI', raw_data[:6])
+                            
+                            # Check if it's a valid WATR packet
+                            if watr_type == 0x5741:  # 'WA'
+                                self.received_count += 1
+                                
+                                # Extract payload
+                                payload_data = raw_data[6:]
+                                if isinstance(payload_data, bytes):
+                                    payload_data = payload_data.decode('utf-8', errors='replace')
+                                
+                                self.watr_packets.append({
+                                    'sequence': self.received_count,
+                                    'timestamp': time.time(),
+                                    'type': watr_type,
+                                    'length': watr_length,
+                                    'payload': payload_data,
+                                    'src_mac': packet[Dot11].addr2,
+                                    'dst_mac': packet[Dot11].addr1
+                                })
+                                
+                                print(f"📥 Received WATR packet #{self.received_count}: {payload_data}")
+                                print(f"   From: {packet[Dot11].addr2} -> {packet[Dot11].addr1}")
+                            else:
+                                # Try original parsing as fallback
+                                watr_packet = WATRHeader(raw_data)
+                                self.received_count += 1
+                                
+                                # Extract payload
+                                payload_data = "unknown"
+                                if watr_packet.haslayer(WATRPayload):
+                                    payload_data = watr_packet[WATRPayload].data
+                                    if isinstance(payload_data, bytes):
+                                        payload_data = payload_data.decode('utf-8', errors='replace')
+                                
+                                self.watr_packets.append({
+                                    'sequence': self.received_count,
+                                    'timestamp': time.time(),
+                                    'type': watr_packet.type,
+                                    'length': watr_packet.length,
+                                    'payload': payload_data,
+                                    'src_mac': packet[Dot11].addr2,
+                                    'dst_mac': packet[Dot11].addr1
+                                })
+                                
+                                print(f"📥 Received WATR packet #{self.received_count}: {payload_data}")
+                                print(f"   From: {packet[Dot11].addr2} -> {packet[Dot11].addr1}")
                         
                     except Exception as e:
                         print(f"⚠️  Error parsing WATR packet: {e}")
