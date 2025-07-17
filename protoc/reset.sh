@@ -1,34 +1,47 @@
 #!/bin/bash
 
 function hw_reset() {
-        sudo raspi-config nonint do_wifi_country XX
+        sudo raspi-config nonint do_wifi_country US
         sudo rfkill unblock all
-        sudo ifconfig mon0 down
         sudo airmon-ng check kill
         sudo systemctl restart NetworkManager
-	sudo ifconfig wlx4c0fc74a9773 down
-	sudo iwconfig wlx4c0fc74a9773 mode monitor
-	sudo iwconfig wlx4c0fc74a9773 chan 6
-	sudo iwconfig wlx4c0fc74a9773
+}
+
+function get_monitor_device() {
+	local DEVICE=( $(./wifi-monitor-check | grep MONITOR | head -n1) )
+	if [[ ! -z ${DEVICE} ]]; then
+		read -ra IFACE<<<$(airmon-ng | grep "${DEVICE}")
+		local IFACE="${IFACE[1]}"
+		echo "${IFACE}"
+	fi
 }
 
 function init_mon() {
-	local DEVICE=( $(./wifi-monitor-check | grep MONITOR | head -n1) )
 
-	if [[ ! -z ${DEVICE} ]]; then
-		sudo ./wifi-monitor-setup "${DEVICE}"
+	local IFACE="${1}"
+
+	if [[ ! -z "${IFACE}" ]]; then
+		sudo ifconfig "${IFACE}" down
+		sudo iwconfig "${IFACE}" mode monitor
+		sudo ifconfig "${IFACE}" up
+		sudo iwconfig "${IFACE}" chan 6
+		sudo iwconfig "${IFACE}"
+	else
+		echo "NO DEVICE SPECIFIED"
 	fi
-
+		
 	#sudo iw dev ${DEVICE} interface add mon0 type monitor
 	#sudo ip link set mon0 up
 	#sudo iw dev mon0 set channel 6
-
+	#sudo ./wifi-monitor-setup "${DEVICE}"
 }
 
 function ap_test() {
-	sudo aireplay-ng --test mon0
+	sudo aireplay-ng --test "${1}"
 }
-hw_reset
-init_mon
-ap_test
+
+DEVICE=$(get_monitor_device)
+hw_reset 
+init_mon "${DEVICE}"
+ap_test "${DEVICE}"
 
