@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <linux/if.h>
 #include <libnl3/netlink/netlink.h>
 #include <libnl3/netlink/genl/genl.h>
 #include <libnl3/netlink/genl/ctrl.h>

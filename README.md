@@ -16,9 +16,10 @@ WATR is a custom network protocol development framework that combines high-perfo
 ### Prerequisites
 
 - Python 3.8+
-- CMake 3.12+
+- CMake 3.12+ (for main project)
 - C++17 compatible compiler
 - Git (for submodules)
+- libnl3 development libraries (for WiFi monitor utilities)
 
 ### Installation
 
@@ -35,7 +36,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Build the project:
+3. Build the WiFi monitor utilities:
+```bash
+# Install dependencies and build WiFi monitor tools
+./build_protoc.sh --install-deps
+
+# Or just build if dependencies already installed
+./build_protoc.sh
+```
+
+4. Build the main project:
 ```bash
 mkdir build && cd build
 cmake ..
@@ -173,9 +183,48 @@ sudo /opt/watr/venv/bin/python test-watr-send.py
 - Includes proper LLC/SNAP headers with custom protocol ID
 - Uses dedicated monitor interface (mon0) for reliable injection
 
-## Monitor Mode Operations
+## WiFi Monitor Utilities
 
-Set WiFi adapter to monitor mode:
+### Building the Monitor Tools
+
+The project includes two rock-solid C programs for WiFi monitor mode operations:
+
+- `wifi-monitor-check` - Detect adapters and their monitor mode capabilities
+- `wifi-monitor-setup` - Create and configure monitor interfaces
+
+```bash
+# Build with automatic dependency installation
+./build_protoc.sh --install-deps
+
+# Quick build (dependencies already installed)
+./build_protoc.sh
+
+# Clean build artifacts
+./build_protoc.sh --clean
+```
+
+### Cross-Platform Support
+
+The build script automatically detects your platform and optimizes compilation:
+
+- **ARM64/Raspberry Pi 4**: `-march=armv8-a+crc+crypto`
+- **x86_64**: `-march=x86-64 -mtune=generic`
+- **Linux distributions**: Ubuntu/Debian, Fedora/RHEL/CentOS, Arch, Alpine
+- **macOS**: Homebrew-based dependency installation
+
+### Usage
+
+```bash
+# Check which adapters support monitor mode
+./wifi-monitor-check
+
+# Create monitor interface on specific PHY
+sudo ./wifi-monitor-setup phy3
+```
+
+### Manual Monitor Mode Operations
+
+Set WiFi adapter to monitor mode manually:
 
 ```bash
 # Enable monitor mode
@@ -198,13 +247,16 @@ watr/
 ├── src/               # C++ implementation
 │   ├── protocol.cpp   # Core protocol logic
 │   └── bindings.cpp   # Python bindings
+├── protoc/            # WiFi monitor utilities
+│   ├── wifi-monitor-check.c   # Adapter detection
+│   └── wifi-monitor-setup.c   # Monitor interface setup
 ├── python/watr/       # Python package
 │   ├── __init__.py   # Python API
 │   ├── scapy_layers.py # Scapy integration
 │   ├── bootstrap.py   # Adapter detection
 │   └── packet_test.py # Packet testing
 ├── tests/            # Test suite
-├── scripts/          # Deployment scripts
+├── build_protoc.sh   # Cross-platform build script
 ├── scapy/           # Scapy submodule
 └── CMakeLists.txt   # Build configuration
 ```
