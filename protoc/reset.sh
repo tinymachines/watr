@@ -6,6 +6,10 @@ function hw_reset() {
         sudo ifconfig mon0 down
         sudo airmon-ng check kill
         sudo systemctl restart NetworkManager
+	sudo ifconfig wlx4c0fc74a9773 down
+	sudo iwconfig wlx4c0fc74a9773 mode monitor
+	sudo iwconfig wlx4c0fc74a9773 chan 6
+	sudo iwconfig wlx4c0fc74a9773
 }
 
 function init_mon() {

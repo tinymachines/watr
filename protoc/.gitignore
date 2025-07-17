@@ -16,3 +16,4 @@ receive-test
 *.dylib
 
 ./aircrack-ng/*
+./scapy/*

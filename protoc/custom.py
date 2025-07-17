@@ -36,7 +36,7 @@ def create_custom_frame(payload, src_addr, dst_addr):
     frame = RadioTap()/dot11/llc/snap/Raw(load=payload)
     return frame
 
-def send_custom_frame(frame, iface="wlan0", count=10):
+def send_custom_frame(frame, iface="wlx4c0fc74a9773", count=10):
     """
     Sends custom frame on specified interface
     """
@@ -48,6 +48,9 @@ if __name__ == "__main__":
     # Example addresses (use your actual node addresses)
     src = "00:11:22:33:44:55"
     dst = "66:77:88:99:AA:BB"
+
+    #src = "00:00:00:00:00:00"
+    #dst = "00:00:00:00:00:00"
 
     # For sniffing custom frames
     def frame_filter(pkt):
@@ -62,7 +65,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
 
         if sys.argv[1] == 'send':
-
             count = 100
             data = f"Meatball Data {count}"
             payload = data.encode ('utf-8')
@@ -71,8 +73,8 @@ if __name__ == "__main__":
 
         elif sys.argv[1] == 'receive':
             # Sniff for responses
-            #sniff(iface="mon0", lfilter=frame_filter, prn=lambda x: x.json())
-            sniff(iface="mon0",  prn=lambda x: x.json())
+            sniff(iface="mon0", lfilter=frame_filter, prn=lambda x: x.json())
+            #sniff(iface="mon0",  prn=lambda x: x.json())
 
     else:
         print ('Usage: python ./custom.py [send|receive]')
