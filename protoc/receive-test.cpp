@@ -12,6 +12,7 @@ extern int create_raw_socket(const char *interface);
 extern int receive_watr_packet(int sockfd, struct watr_packet *pkt, size_t *pkt_len);
 extern void print_mac_address(const char *label, const uint8_t *mac);
 extern void print_watr_packet(const struct watr_packet *pkt, size_t pkt_len);
+extern void print_hex_dump(const uint8_t *data, size_t len, const char *label);
 
 static volatile int running = 1;
 
@@ -21,9 +22,11 @@ void signal_handler(int sig) {
 }
 
 void print_usage(const char *prog) {
-    fprintf(stderr, "Usage: %s <interface>\n", prog);
+    fprintf(stderr, "Usage: %s <interface> [exit_count]\n", prog);
     fprintf(stderr, "  interface: Monitor mode interface (e.g., mon0)\n");
+    fprintf(stderr, "  exit_count: (optional) Exit after receiving this many WATR packets\n");
     fprintf(stderr, "\nExample: %s mon0\n", prog);
+    fprintf(stderr, "         %s mon0 10  # Exit after 10 WATR packets\n", prog);
 }
 
 int set_socket_nonblocking(int sockfd) {
@@ -48,6 +51,7 @@ int main(int argc, char *argv[]) {
     size_t pkt_len;
     int packet_count = 0;
     int watr_count = 0;
+    int exit_count = 0;  // 0 means no limit
     time_t start_time, current_time, last_packet_time;
     
     // Check arguments
@@ -57,6 +61,15 @@ int main(int argc, char *argv[]) {
     }
     
     interface = argv[1];
+    
+    // Check for optional exit count
+    if (argc >= 3) {
+        exit_count = atoi(argv[2]);
+        if (exit_count < 0) {
+            fprintf(stderr, "Error: exit_count must be a positive number\n");
+            return 1;
+        }
+    }
     
     // Check if running as root
     if (geteuid() != 0) {
@@ -84,6 +97,9 @@ int main(int argc, char *argv[]) {
     
     printf("Starting WATR packet reception...\n");
     printf("Listening on interface: %s\n", interface);
+    if (exit_count > 0) {
+        printf("Will exit after %d WATR packets\n", exit_count);
+    }
     printf("Press Ctrl+C to stop\n\n");
     
     start_time = time(NULL);
@@ -124,6 +140,12 @@ int main(int argc, char *argv[]) {
             }
             
             printf("========================\n");
+            
+            // Check if we should exit
+            if (exit_count > 0 && watr_count >= exit_count) {
+                printf("\nReached exit count of %d WATR packets. Exiting...\n", exit_count);
+                running = 0;
+            }
             
         } else if (ret == 0) {
             // Not a WATR packet, count total packets

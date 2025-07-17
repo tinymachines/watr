@@ -9,6 +9,9 @@
 #include <linux/if_packet.h>
 #include <net/ethernet.h>
 
+// Forward declaration
+void print_hex_dump(const uint8_t *data, size_t len, const char *label);
+
 int create_raw_socket(const char *interface) {
     int sockfd;
     struct sockaddr_ll sll;
@@ -122,6 +125,10 @@ int receive_watr_packet(int sockfd, struct watr_packet *pkt, size_t *pkt_len) {
     
     // Check WATR magic
     if (ntohl(pkt->watr.magic) != WATR_MAGIC) {
+        // Print hex dump of the entire frame if magic doesn't match
+        printf("\n*** Frame with incorrect WATR magic received ***\n");
+        printf("Expected magic: 0x%08X, Got: 0x%08X\n", WATR_MAGIC, ntohl(pkt->watr.magic));
+        print_hex_dump((const uint8_t *)pkt, received, "Full frame dump");
         return 0; // Invalid magic
     }
     
@@ -131,6 +138,29 @@ int receive_watr_packet(int sockfd, struct watr_packet *pkt, size_t *pkt_len) {
 void print_mac_address(const char *label, const uint8_t *mac) {
     printf("%s: %02x:%02x:%02x:%02x:%02x:%02x\n", label,
            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+}
+
+void print_hex_dump(const uint8_t *data, size_t len, const char *label) {
+    printf("%s (%zu bytes):\n", label, len);
+    for (size_t i = 0; i < len; i++) {
+        if (i % 16 == 0) {
+            printf("  %04zx: ", i);
+        }
+        printf("%02x ", data[i]);
+        if (i % 16 == 15 || i == len - 1) {
+            // Print ASCII representation
+            int spaces = (16 - (i % 16)) * 3 - 1;
+            if (i % 16 != 15) spaces += 16 - (i % 16);
+            printf("%*s", spaces, "");
+            printf(" |");
+            size_t start = i - (i % 16);
+            for (size_t j = start; j <= i; j++) {
+                uint8_t c = data[j];
+                printf("%c", (c >= 32 && c <= 126) ? c : '.');
+            }
+            printf("|\n");
+        }
+    }
 }
 
 void print_watr_packet(const struct watr_packet *pkt, size_t pkt_len) {
