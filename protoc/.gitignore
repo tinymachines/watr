@@ -14,3 +14,5 @@ receive-test
 *.a
 *.so
 *.dylib
+
+./aircrack-ng/*
