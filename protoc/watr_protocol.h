@@ -13,6 +13,7 @@
 // 802.11 frame types
 #define IEEE80211_FTYPE_DATA 0x08
 #define IEEE80211_STYPE_DATA 0x00
+#define IEEE80211_FCTL_FROMDS 0x0200  // From-DS flag
 
 // Radiotap header flags
 #define IEEE80211_RADIOTAP_PRESENT_FLAGS 0x00000002
@@ -83,11 +84,11 @@ static inline void init_radiotap_header(struct radiotap_header *rt) {
 static inline void init_ieee80211_header(struct ieee80211_hdr *hdr, 
                                         const uint8_t *dst, 
                                         const uint8_t *src) {
-    hdr->frame_control = htole16(IEEE80211_FTYPE_DATA);
+    hdr->frame_control = htole16(IEEE80211_FTYPE_DATA | IEEE80211_FCTL_FROMDS);
     hdr->duration = 0;
     memcpy(hdr->addr1, dst, ETH_ALEN);
     memcpy(hdr->addr2, src, ETH_ALEN);
-    memcpy(hdr->addr3, dst, ETH_ALEN);  // Use dst as BSSID
+    memcpy(hdr->addr3, src, ETH_ALEN);  // Use src as BSSID (matches Python)
     hdr->seq_ctrl = 0;
 }
 
