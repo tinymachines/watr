@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ${WATR_ROOT}/watr-header.sh
+
 function hw_reset() {
         sudo raspi-config nonint do_wifi_country US
         sudo rfkill unblock all
@@ -8,7 +10,7 @@ function hw_reset() {
 }
 
 function get_monitor_device() {
-	local DEVICE=( $(./wifi-monitor-check | grep MONITOR | head -n1) )
+	local DEVICE=( $( ${WATR_ROOT}/wifi-monitor-check | grep MONITOR | head -n1) )
 	if [[ ! -z ${DEVICE} ]]; then
 		read -ra IFACE<<<$(airmon-ng | grep "${DEVICE}")
 		local IFACE="${IFACE[1]}"
@@ -37,15 +39,21 @@ function init_mon() {
 	#sudo ./wifi-monitor-setup "${DEVICE}"
 }
 
-function ap_test() {
+function test_aireplay() {
 	sudo aireplay-ng --test "${1}"
 }
 
-DEVICE=$(get_monitor_device)
-if [[ -z ${DEVICE} ]]; then
-	echo "NO DEVICE SPECIFIED"
-fi
-hw_reset 
-init_mon "${DEVICE}"
-ap_test "${DEVICE}"
+function test_scapy() {
+	sudo -E PYTHONPATH=".:.${WATR_ROOT}/scapy" $(which python) ${WATR_ROOT}/custom.py send
+}
+
+function  init_main() {
+	hw_reset
+	init_mon "${WATR_DEVICE}"
+}
+
+#DEVICE=$(get_monitor_device)
+#if [[ -z ${DEVICE} ]]; then
+#	echo "NO DEVICE SPECIFIED"
+#fi
 
