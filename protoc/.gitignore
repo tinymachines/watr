@@ -17,3 +17,8 @@ receive-test
 
 ./aircrack-ng/*
 ./scapy/*
+
+.env
+custom_frame
+wifi-monitor-check
+wifi-monitor-setup
