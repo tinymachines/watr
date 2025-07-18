@@ -28,7 +28,7 @@ def send_80211_frame():
     frame = RadioTap() / Dot11(type=0, subtype=4, addr1=dst_mac, addr2=src_mac, addr3="00:00:00:00:00:00")
     
     # Send the frame
-    sendp(frame, iface="mon0", count=5, inter=1)  # Change "wlan0" to your actual Wi-Fi interface
+    sendp(frame, iface="mon0", count=100, inter=1)  # Change "wlan0" to your actual Wi-Fi interface
     
     print("802.11 frame sent!")
 
