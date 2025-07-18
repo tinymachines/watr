@@ -27,9 +27,10 @@ function init_mon() {
 		sudo iwconfig "${IFACE}" chan 6
 		sudo iwconfig "${IFACE}"
 	else
-		echo "NO DEVICE SPECIFIED"
+		:
 	fi
-		
+
+	# This does not work	
 	#sudo iw dev ${DEVICE} interface add mon0 type monitor
 	#sudo ip link set mon0 up
 	#sudo iw dev mon0 set channel 6
@@ -41,6 +42,9 @@ function ap_test() {
 }
 
 DEVICE=$(get_monitor_device)
+if [[ -z ${DEVICE} ]]; then
+	echo "NO DEVICE SPECIFIED"
+fi
 hw_reset 
 init_mon "${DEVICE}"
 ap_test "${DEVICE}"
