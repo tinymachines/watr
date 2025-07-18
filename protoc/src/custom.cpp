@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <tins/tins.h>
+using namespace Tins;
 
 using namespace Tins;
 
@@ -36,29 +38,29 @@ public:
         dot11_frame.addr1(dst_addr);  // Destination address
         dot11_frame.addr2(src_addr);  // Source address  
         dot11_frame.addr3(src_addr);  // BSSID (using source address)
-
-	// Create LLC header
-	LLC llc_header;
-	llc_header.dsap(0xAA);
-	llc_header.ssap(0xAA);
-	llc_header.type(LLC::INFORMATION);
-	llc_header.send_seq_number(0x03);	
         
-        /* Create LLC header
+        // Create LLC header
         LLC llc_header;
         llc_header.dsap(0xAA);  // Individual LLC SAP
         llc_header.ssap(0xAA);  // Individual LLC SAP
-        llc_header.control(0x03); // Unnumbered Information*/
 
-	// Create SNAP header
+	// Set frame format type
+	llc_header.type(LLC::INFORMATION);
+
+	// Set sequence numbers
+	llc_header.send_seq_number(0x03);      // Send sequence number
+	llc_header.receive_seq_number(0x03);   // Receive sequence number
+
+	// Set modifier function for unnumbered frames
+	llc_header.modifier_function(LLC::UI);
+
+	// Set poll/final bit
+	llc_header.poll_final(true);
+
+        // Create SNAP header with custom protocol ID
 	SNAP snap_header;
-	snap_header.org_code(0x000000);    // Set OUI correctly
-	snap_header.eth_type(0x8999);      // Set protocol type correctly 
-
-        /* Create SNAP header with custom protocol ID
-        SNAP snap_header;
-        snap_header.oui(0x000000);  // Organization Code
-        snap_header.type(0x8999);   // Custom protocol ID*/
+	snap_header.org_code(0x000000);    // Organization Code
+	snap_header.eth_type(0x8999);      // Custom protocol ID
         
         // Create payload
         RawPDU raw_payload(payload);
@@ -74,13 +76,8 @@ public:
      */
     void send_custom_frame(const std::string& payload, int count = 10) {
         try {
-            std::cout << "Creating packet sender for interface: " << interface_name << std::endl;
-            
             // Create the packet sender
             PacketSender sender;
-            
-            std::cout << "Creating custom frame with payload: " << payload << std::endl;
-            std::cout << "Source: " << src_addr << ", Destination: " << dst_addr << std::endl;
             
             // Create the frame
             auto frame = create_custom_frame(payload);
@@ -93,18 +90,12 @@ public:
             
             // Send the frame multiple times
             for (int i = 0; i < count; ++i) {
-                try {
-                    sender.send(radiotap_frame, interface_name);
-                    std::cout << "Frame " << (i + 1) << "/" << count << " sent successfully" << std::endl;
-                } catch (const std::exception& send_error) {
-                    std::cerr << "Error sending frame " << (i + 1) << ": " << send_error.what() << std::endl;
-                }
+                sender.send(radiotap_frame, interface_name);
+                std::cout << "Frame " << (i + 1) << " sent" << std::endl;
             }
             
-            std::cout << "Finished sending frames." << std::endl;
-            
         } catch (const std::exception& e) {
-            std::cerr << "Error in send_custom_frame: " << e.what() << std::endl;
+            std::cerr << "Error sending frame: " << e.what() << std::endl;
         }
     }
     
@@ -125,6 +116,7 @@ public:
             // Check for SNAP header with our custom protocol ID
             const SNAP* snap = pdu.find_pdu<SNAP>();
             if (!snap) return false;
+            
             return snap->eth_type() == 0x8999;  // Match our custom protocol ID
             
         } catch (const std::exception&) {
