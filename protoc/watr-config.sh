@@ -3,6 +3,7 @@
 source ${WATR_ROOT}/watr-header.sh
 
 function hw_reset() {
+	sudo usbreset 001/004
         sudo raspi-config nonint do_wifi_country US
         sudo rfkill unblock all
         sudo airmon-ng check kill
