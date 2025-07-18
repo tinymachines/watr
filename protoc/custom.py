@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
         elif sys.argv[1] == 'receive':
             # Sniff for responses
-            sniff(iface="mon0", lfilter=frame_filter, prn=lambda x: x.json())
+            sniff(iface="wlan1", lfilter=frame_filter, prn=lambda x: x.json())
             #sniff(iface="mon0",  prn=lambda x: x.json())
 
     else:
