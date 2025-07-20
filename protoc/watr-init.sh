@@ -1,5 +1,7 @@
 #!/bin/bash
 
+COMMAND="${1}"
+
 source ${WATR_ROOT}/watr-header.sh
 source ${WATR_ROOT}/watr-config.sh
 

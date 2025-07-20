@@ -52,8 +52,10 @@ function test_scapy() {
 }
 
 function  init_main() {
-	hw_reset
-	init_mon "${WATR_DEVICE}"
+	if [[ ${COMMAND} == "startup" ]]; then
+		hw_reset
+		init_mon "${WATR_DEVICE}"
+	fi
 }
 
 #DEVICE=$(get_monitor_device)
