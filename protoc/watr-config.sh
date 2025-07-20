@@ -3,11 +3,12 @@
 source ${WATR_ROOT}/watr-header.sh
 
 function hw_reset() {
+	sudo usbreset 001/003
 	sudo usbreset 001/004
         sudo raspi-config nonint do_wifi_country US
         sudo rfkill unblock all
-        sudo airmon-ng check kill
-        sudo systemctl restart NetworkManager
+        #sudo airmon-ng check kill
+        #sudo systemctl restart NetworkManager
 }
 
 function get_monitor_device() {
