@@ -3,8 +3,10 @@
 source ${WATR_ROOT}/watr-header.sh
 
 function hw_reset() {
-	sudo usbreset 001/003
-	sudo usbreset 001/004
+	
+	read -ra PARTS<<<$(lsusb | grep -iE "realtek|801[.]11" | sed --expression "s/[^0-9 ]/ /g")
+
+	sudo usbreset ${PARTS[0]}/${PARTS[1]}
         sudo raspi-config nonint do_wifi_country US
         sudo rfkill unblock all
         #sudo airmon-ng check kill
