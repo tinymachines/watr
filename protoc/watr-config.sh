@@ -4,7 +4,7 @@ source ${WATR_ROOT}/watr-header.sh
 
 function hw_reset() {
 	
-	read -ra PARTS<<<$(lsusb | grep -iE "realtek|801[.]11" | sed --expression "s/[^0-9 ]/ /g")
+	read -ra PARTS<<<$(lsusb | grep -iE "wireless|realtek|801[.]11" | sed --expression "s/[^0-9 ]/ /g")
 
 	sudo usbreset ${PARTS[0]}/${PARTS[1]}
         sudo raspi-config nonint do_wifi_country US
