@@ -4,13 +4,17 @@ source ${WATR_ROOT}/watr-header.sh
 
 function hw_reset() {
 	
+	local IFACE="${1}"
+	sudo ifconfig "${IFACE}" down
+
 	read -ra PARTS<<<$(lsusb | grep -iE "wireless|realtek|801[.]11" | sed --expression "s/[^0-9 ]/ /g")
 
 	sudo usbreset ${PARTS[0]}/${PARTS[1]}
-        sudo raspi-config nonint do_wifi_country US
-        sudo rfkill unblock all
+	sleep 5
+        #sudo raspi-config nonint do_wifi_country US
+        #sudo rfkill unblock all
         #sudo airmon-ng check kill
-        #sudo systemctl restart NetworkManager
+       	#sudo systemctl restart NetworkManager
 }
 
 function get_monitor_device() {
@@ -29,8 +33,17 @@ function init_mon() {
 	if [[ ! -z "${IFACE}" ]]; then
 		sudo ifconfig "${IFACE}" down
 		sudo iwconfig "${IFACE}" mode monitor
+		sudo ifconfig "${IFACE}" multicast
 		sudo ifconfig "${IFACE}" up
+		#sudo iwconfig "${IFACE}" txpower 15
+		#sudo iwconfig "${IFACE}" sens -80
+		#sudo iwconfig "${IFACE}" retry 16
+		#sudo iwconfig "${IFACE}" power off
+		#sudo iwconfig "${IFACE}" rate 2M
 		sudo iwconfig "${IFACE}" chan 6
+		sudo iwconfig "${IFACE}" rts 2347 
+		#sudo iwconfig "${IFACE}" frag 512
+		#sudo iwconfig "${IFACE}" modu auto
 		sudo iwconfig "${IFACE}"
 	else
 		:
@@ -53,8 +66,10 @@ function test_scapy() {
 
 function  init_main() {
 	if [[ ${COMMAND} == "startup" ]]; then
-		hw_reset
+		hw_reset "${WATR_DEVICE}"
 		init_mon "${WATR_DEVICE}"
+		source ./watr-addr.sh
+		test_aireplay "${WATR_DEVICE}"
 	fi
 }
 

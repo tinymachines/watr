@@ -17,3 +17,6 @@ receive-test
 
 ./aircrack-ng/*
 ./scapy/*
+./logs/*
+./conf/*
+pass.txt

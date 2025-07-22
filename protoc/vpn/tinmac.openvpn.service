@@ -1,0 +1,15 @@
+[Unit] 
+Description=OpenVPN
+After=network-online.target 
+ 
+[Service] 
+Type=idle 
+Restart=on-failure 
+RestartSec=5s 
+ExecStart=/home/bisenbek/spidr/scripts/networking/vpn/automation.sh
+ExecStop=/bin/kill -s TERM $MAINPID 
+WorkingDirectory=/home/bisenbek/spidr/scripts/networking/vpn
+ 
+[Install] 
+WantedBy=multi-user.target 
+Alias=tinmac.openvpn.service
