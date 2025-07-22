@@ -22,4 +22,3 @@ if [[ ! -z ${WATR_DEVICE} ]]; then
 	export WATR_DEVICE="${WATR_DEVICE}"
 	set WATR_DEVICE="${WATR_DEVICE}"
 fi
-

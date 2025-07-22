@@ -68,7 +68,6 @@ function  init_main() {
 	if [[ ${COMMAND} == "startup" ]]; then
 		hw_reset "${WATR_DEVICE}"
 		init_mon "${WATR_DEVICE}"
-		source ./watr-addr.sh
 		test_aireplay "${WATR_DEVICE}"
 	fi
 }
