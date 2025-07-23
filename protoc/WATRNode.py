@@ -296,7 +296,8 @@ class WATRNode:
         message = {'role': 'user', 'content': 'Say something nice.'}
         async for part in await AsyncClient().chat(
                 model='qwen3:0.6b', messages=[message], stream=True
-        ): print(part['message']['content'], end='', flush=True)
+        ):self.send_message('chat', {'text': part['message']['content']})
+        # print(part['message']['content'], end='', flush=True)
 
     def send_message(self, message_type: str, payload: Dict[str, Any], dst_addr: str = None):
         """Send a custom message"""
@@ -332,7 +333,8 @@ async def main():
     
     # Example custom message handler
     def custom_handler(message: WATRMessage):
-        print(f"Custom handler received: {message.message_type} - {message.payload}")
+        print (message)
+        #print(f"Custom handler received: {message.message_type} - {message.payload}")
     
     node.register_handler('chat', custom_handler)
     
