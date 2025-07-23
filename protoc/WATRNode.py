@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from scapy.all import *
 from scapy.layers.dot11 import *
 from ollama import AsyncClient
-
+import uuid
 
 
 @dataclass
@@ -293,11 +293,22 @@ class WATRNode:
         await self.protocol.stop()
 
     async def chat(self):
-        message = {'role': 'user', 'content': 'Say something nice.'}
+        cid=uuid.uuid4().hex
+        seg=0
+        message = {'role': 'user', 'content': 'Hi'}
         async for part in await AsyncClient().chat(
                 model='qwen3:0.6b', messages=[message], stream=True
-        ):self.send_message('chat', {'text': part['message']['content']})
-        # print(part['message']['content'], end='', flush=True)
+        ):
+            self.send_message(
+                    'chat', 
+                    {'cid':cid, "seg":seg, 'text':part['message']['content']}
+            )
+            seg+=1
+        self.send_message(
+                'chat',
+                {'cid':cid, "seg":seg, 'text': None}
+        )
+
 
     def send_message(self, message_type: str, payload: Dict[str, Any], dst_addr: str = None):
         """Send a custom message"""
