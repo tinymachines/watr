@@ -40,8 +40,8 @@ function init_mon() {
 		#sudo iwconfig "${IFACE}" retry 16
 		#sudo iwconfig "${IFACE}" power off
 		#sudo iwconfig "${IFACE}" rate 2M
-		sudo iwconfig "${IFACE}" chan 6
-		sudo iwconfig "${IFACE}" rts 2347 
+		sudo iwconfig "${IFACE}" chan ${WATR_CHAN}
+		sudo iwconfig "${IFACE}" rts ${WATR_RTS}
 		#sudo iwconfig "${IFACE}" frag 512
 		#sudo iwconfig "${IFACE}" modu auto
 		sudo iwconfig "${IFACE}"

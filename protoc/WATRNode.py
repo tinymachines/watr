@@ -9,6 +9,8 @@ from abc import ABC, abstractmethod
 
 from scapy.all import *
 from scapy.layers.dot11 import *
+from ollama import AsyncClient
+import uuid
 
 
 @dataclass
@@ -290,6 +292,24 @@ class WATRNode:
             
         await self.protocol.stop()
 
+    async def chat(self):
+        cid=uuid.uuid4().hex
+        seg=0
+        message = {'role': 'user', 'content': 'Hi'}
+        async for part in await AsyncClient().chat(
+                model='qwen3:0.6b', messages=[message], stream=True
+        ):
+            self.send_message(
+                    'chat', 
+                    {'cid':cid, "seg":seg, 'text':part['message']['content']}
+            )
+            seg+=1
+        self.send_message(
+                'chat',
+                {'cid':cid, "seg":seg, 'text': None}
+        )
+
+
     def send_message(self, message_type: str, payload: Dict[str, Any], dst_addr: str = None):
         """Send a custom message"""
         message = WATRMessage(
@@ -324,7 +344,8 @@ async def main():
     
     # Example custom message handler
     def custom_handler(message: WATRMessage):
-        print(f"Custom handler received: {message.message_type} - {message.payload}")
+        print (message)
+        #print(f"Custom handler received: {message.message_type} - {message.payload}")
     
     node.register_handler('chat', custom_handler)
     
@@ -334,7 +355,19 @@ async def main():
         
         # Example: send a custom message after 5 seconds
         await asyncio.sleep(5)
-        node.send_message('chat', {'text': 'Hello from WATR node!'})
+        await node.chat()
+       # from ollama import chat
+       # from ollama import ChatResponse
+
+       # response: ChatResponse = chat(model='qwen3:0.6b', messages=[{
+       #     'role': 'user',
+       #     'content': 'Say Hello in a random language.',
+       #     'format': 'json',
+       #     'think': true,
+       #     'stream': false
+       #     },])
+       # #print(response['message']['content'])
+       # node.send_message('chat', {'text': response.message.content[0:100]})
         
         # Keep running
         while True:
