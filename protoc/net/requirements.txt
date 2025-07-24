@@ -1,0 +1,25 @@
+# WATR Node Dependencies
+
+# Network packet manipulation
+scapy>=2.4.5
+
+# Ollama client for LLM integration
+ollama>=0.1.0
+
+# Python standard library modules used:
+# - asyncio (built-in)
+# - queue (built-in)
+# - threading (built-in)
+# - time (built-in)
+# - json (built-in)
+# - typing (built-in)
+# - dataclasses (built-in, Python 3.7+)
+# - abc (built-in)
+# - uuid (built-in)
+# - sys (built-in)
+# - signal (built-in)
+
+# Optional development dependencies
+# pytest>=6.0.0  # For testing
+# black>=21.0.0   # For code formatting
+# flake8>=3.8.0   # For linting
