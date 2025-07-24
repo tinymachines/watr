@@ -290,7 +290,7 @@ class HandlerManager:
                     except Exception as e:
                         print(f"Error in handler {handler_name}: {e}")
         
-        return lambda msg: asyncio.create_task(dispatcher(msg))
+        return dispatcher
     
     def list_handlers(self) -> Dict[str, List[str]]:
         """List all loaded handlers and their message types"""

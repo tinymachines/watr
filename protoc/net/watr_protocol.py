@@ -202,9 +202,17 @@ class WATRProtocol:
                     )
                     
                     if handler:
-                        # Run handler in thread to avoid blocking event loop
-                        loop = asyncio.get_event_loop()
-                        await loop.run_in_executor(None, handler, message)
+                        try:
+                            # Check if handler is a coroutine function (async)
+                            if asyncio.iscoroutinefunction(handler):
+                                # Call async handler directly on the event loop
+                                await handler(message)
+                            else:
+                                # Run synchronous handler in thread to avoid blocking
+                                loop = asyncio.get_event_loop()
+                                await loop.run_in_executor(None, handler, message)
+                        except Exception as e:
+                            print(f"Error in message handler: {e}")
                     
                     self.inbound_queue.task_done()
                     
