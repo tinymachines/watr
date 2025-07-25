@@ -23,8 +23,18 @@ class NodeCapability:
     created_at: float
     performance_metrics: Dict[str, float] = None
     
+    def __post_init__(self):
+        """Ensure performance_metrics is never None"""
+        if self.performance_metrics is None:
+            self.performance_metrics = {}
+    
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        """Convert to dictionary, handling None values safely"""
+        data = asdict(self)
+        # Ensure performance_metrics is always a dict
+        if data.get('performance_metrics') is None:
+            data['performance_metrics'] = {}
+        return data
 
 
 @dataclass
@@ -115,7 +125,8 @@ class SelfHandler(WATRHandler):
             version="1.0", 
             description="Load and unload message handlers at runtime",
             message_types=["handler_load", "handler_unload"],
-            created_at=time.time()
+            created_at=time.time(),
+            performance_metrics={}
         ))
     
     def register_conversation_capability(self):
@@ -125,7 +136,8 @@ class SelfHandler(WATRHandler):
             version="1.0",
             description="Accumulate and process streaming conversations",
             message_types=["chat"],
-            created_at=time.time()
+            created_at=time.time(),
+            performance_metrics={}
         ))
     
     def add_capability(self, capability: NodeCapability):
@@ -144,11 +156,15 @@ class SelfHandler(WATRHandler):
     
     def _announce_capability(self, capability: NodeCapability):
         """Announce a new capability to the network"""
-        self.node.send_message('capability_announce', {
-            'node_id': self.identity.node_id,
-            'node_name': self.identity.name,
-            'capability': capability.to_dict()
-        })
+        try:
+            capability_dict = capability.to_dict()
+            self.node.send_message('capability_announce', {
+                'node_id': self.identity.node_id,
+                'node_name': self.identity.name,
+                'capability': capability_dict
+            })
+        except Exception as e:
+            print(f"Error announcing capability {capability.name}: {e}")
     
     async def handle_message(self, message: WATRMessage) -> None:
         """Handle incoming self-related messages"""

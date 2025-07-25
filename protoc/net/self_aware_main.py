@@ -159,9 +159,13 @@ async def main():
                 print(f"   Known peers: {summary['known_peers']}")
                 print(f"   Memories: {summary['memories']}")
                 
-                # Re-announce capabilities
-                for cap in self_handler.capabilities.values():
-                    self_handler._announce_capability(cap)
+                # Re-announce capabilities with error handling
+                try:
+                    for cap_name, cap in self_handler.capabilities.items():
+                        self_handler._announce_capability(cap)
+                    print(f"   📡 Re-announced {len(self_handler.capabilities)} capabilities")
+                except Exception as e:
+                    print(f"   ⚠️  Error re-announcing capabilities: {e}")
     
     except KeyboardInterrupt:
         print("\n🛑 Shutting down self-aware node...")
