@@ -213,51 +213,68 @@ class SelfHandler(WATRHandler):
         """Process responses from other nodes"""
         node_id = message.payload.get('node_id')
         if not node_id:
-            return
-        
-        # Store peer information
+          return
+
+        # Store peer information with proper structure
         peer_info = {
-            'node_id': node_id,
-            'last_seen': time.time(),
-            'src_addr': message.src_addr,
-            'data': message.payload
+          'node_id': node_id,
+          'last_seen': time.time(),
+          'src_addr': message.src_addr,
+          'capabilities': {},  # Always ensure capabilities key exists
+          'data': message.payload
         }
-        
+
         self.known_peers[node_id] = peer_info
-        
+
         # Extract interesting info
         identity = message.payload.get('identity', {})
         capabilities = message.payload.get('capabilities', {})
-        
+
+        # If the response included capabilities, store them
+        if capabilities:
+          self.known_peers[node_id]['capabilities'] = capabilities
+
         print(f"Learned about peer '{identity.get('name', 'Unknown')}' with {len(capabilities)} capabilities")
-        
+
         # Remember interesting facts
         if identity.get('name'):
-            self.memory.remember(f"peer_{node_id}_name", identity['name'])
-        
+          self.memory.remember(f"peer_{node_id}_name", identity['name'])
+
         if capabilities:
-            self.memory.remember(f"peer_{node_id}_capabilities", list(capabilities.keys()))
-    
+          self.memory.remember(f"peer_{node_id}_capabilities", list(capabilities.keys()))
+ 
     async def _handle_capability_announce(self, message: WATRMessage):
         """Handle capability announcements from other nodes"""
-        node_id = message.payload.get('node_id')
-        capability = message.payload.get('capability')
-        
-        if node_id and capability:
+        try:
+            node_id = message.payload.get('node_id')
+            capability = message.payload.get('capability')
+
+            if not node_id or not capability:
+                print(f"Invalid capability announcement: missing node_id or capability")
+                return
+
+            if not isinstance(capability, dict) or 'name' not in capability:
+                print(f"Invalid capability format from {node_id}")
+                return
+
             # Update peer info
             if node_id not in self.known_peers:
                 self.known_peers[node_id] = {
-                    'node_id': node_id,
-                    'capabilities': {},
-                    'last_seen': time.time(),
-                    'src_addr': message.src_addr
-                }
-            
+                        'node_id': node_id,
+                        'capabilities': {},
+                        'last_seen': time.time(),
+                        'src_addr': message.src_addr
+                        }
+
             self.known_peers[node_id]['capabilities'][capability['name']] = capability
             self.known_peers[node_id]['last_seen'] = time.time()
-            
+
             print(f"Peer {message.payload.get('node_name', node_id[:8])} announced capability: {capability['name']}")
-    
+
+        except Exception as e:
+            print(f"Error handling capability announcement: {e}")
+            print(f"Message payload: {message.payload}")
+
     def query_peer(self, peer_addr: str = None, query_type: str = 'full'):
         """Query a specific peer or broadcast to all"""
         query_id = str(uuid.uuid4())
