@@ -42,11 +42,25 @@ class LoggedLLMSocialHandler(LLMSocialHandler, WATRLoggerMixin):
         """Handle messages with detailed logging"""
         start_time = time.time()
         
-        # Log incoming message
+        # Log incoming message with full content
         self.log_message_received(message, {
             'handler_type': 'llm_social',
             'personality_role': self.personality_traits['role']
         })
+        
+        # Log detailed message content for social interactions
+        if message.message_type in ['social_chat', 'social_introduction', 'network_gossip']:
+            content = message.payload.get('content', '')
+            self.logger.info(
+                f"Social message content: {content}",
+                extra={
+                    **self.log_extra,
+                    'msg_type': message.message_type,
+                    'full_content': content,
+                    'content_length': len(content),
+                    'from_peer': message.src_addr
+                }
+            )
         
         try:
             # Call parent handler
@@ -130,11 +144,24 @@ class LoggedLLMSocialHandler(LLMSocialHandler, WATRLoggerMixin):
             self.log_performance("intelligent_gossip_generation", duration)
             
             self.logger.info(
-                f"Generated intelligent gossip: {result[:50]}...",
+                f"Generated intelligent gossip",
                 extra={
                     **self.log_extra,
                     'gossip_length': len(result),
-                    'generation_time': duration
+                    'generation_time': duration,
+                    'full_gossip_content': result,  # Log full content
+                    'event_type': 'gossip_generated'
+                }
+            )
+            
+            # Log gossip content separately for easy reading
+            self.logger.info(
+                f"GOSSIP CONTENT: {result}",
+                extra={
+                    **self.log_extra,
+                    'event_type': 'gossip_content_detail',
+                    'gossip_text': result,
+                    'personality_role': self.personality_traits['role']
                 }
             )
             
@@ -149,14 +176,14 @@ class LoggedLLMSocialHandler(LLMSocialHandler, WATRLoggerMixin):
         """Generate LLM response with detailed logging"""
         start_time = time.time()
         
-        self.logger.debug(
+        self.logger.info(
             f"LLM request started",
             extra={
                 **self.log_extra,
                 'model': self.model,
                 'prompt_length': len(prompt),
                 'max_words': max_words,
-                'prompt_preview': prompt[:100] + "..." if len(prompt) > 100 else prompt
+                'full_prompt': prompt  # Log the complete prompt
             }
         )
         
@@ -165,7 +192,23 @@ class LoggedLLMSocialHandler(LLMSocialHandler, WATRLoggerMixin):
             
             duration = time.time() - start_time
             
-            # Log the interaction
+            # Log the complete interaction with full content
+            self.logger.info(
+                f"LLM Response Generated",
+                extra={
+                    **self.log_extra,
+                    'model': self.model,
+                    'prompt_length': len(prompt),
+                    'response_length': len(response),
+                    'duration_s': duration,
+                    'max_words': max_words,
+                    'actual_words': len(response.split()),
+                    'full_prompt': prompt,
+                    'full_response': response  # Log the complete response
+                }
+            )
+            
+            # Also use the structured LLM interaction logger
             self.log_llm_interaction(prompt, response, self.model, duration, {
                 'max_words': max_words,
                 'actual_words': len(response.split())
@@ -178,7 +221,8 @@ class LoggedLLMSocialHandler(LLMSocialHandler, WATRLoggerMixin):
             self.log_error(e, "LLM response generation", {
                 'model': self.model,
                 'duration': duration,
-                'prompt_length': len(prompt)
+                'prompt_length': len(prompt),
+                'full_prompt': prompt
             })
             
             # Return fallback
@@ -212,7 +256,7 @@ class LoggedConversationHandler(ConversationAccumulatorHandler, WATRLoggerMixin)
         text = message.payload.get('text')
         
         if cid:
-            self.logger.debug(
+            self.logger.info(
                 f"Processing conversation segment",
                 extra={
                     **self.log_extra,
@@ -220,9 +264,22 @@ class LoggedConversationHandler(ConversationAccumulatorHandler, WATRLoggerMixin)
                     'segment': seg,
                     'is_terminator': text is None,
                     'text_length': len(text) if text else 0,
+                    'segment_text': text,  # Log the actual segment content
                     'active_conversations': len(self.active_conversations)
                 }
             )
+            
+            # Log segment content for easier debugging
+            if text:
+                self.logger.info(
+                    f"Conversation segment content: {text}",
+                    extra={
+                        **self.log_extra,
+                        'conversation_id': cid,
+                        'segment': seg,
+                        'full_segment_text': text
+                    }
+                )
         
         # Call parent handler
         await super().handle_message(message)
@@ -236,6 +293,9 @@ class LoggedConversationHandler(ConversationAccumulatorHandler, WATRLoggerMixin)
         segment_count = len(conversation['segments'])
         duration = time.time() - conversation['start_time']
         
+        # Build complete conversation text for logging
+        complete_text = ''.join(conversation['segments'])
+        
         self.logger.info(
             f"Completing conversation {cid[:8]}",
             extra={
@@ -243,6 +303,21 @@ class LoggedConversationHandler(ConversationAccumulatorHandler, WATRLoggerMixin)
                 'conversation_id': cid,
                 'segment_count': segment_count,
                 'duration': duration,
+                'src_addr': conversation['src_addr'],
+                'complete_conversation_text': complete_text,  # Log full conversation
+                'conversation_length': len(complete_text),
+                'word_count': len(complete_text.split())
+            }
+        )
+        
+        # Log the complete conversation content separately for readability
+        self.logger.info(
+            f"COMPLETE CONVERSATION [{cid[:8]}]: {complete_text}",
+            extra={
+                **self.log_extra,
+                'conversation_id': cid,
+                'event_type': 'complete_conversation_content',
+                'full_text': complete_text,
                 'src_addr': conversation['src_addr']
             }
         )
@@ -253,12 +328,14 @@ class LoggedConversationHandler(ConversationAccumulatorHandler, WATRLoggerMixin)
         # Log completion
         self.log_network_event(
             'conversation_completed',
-            f"Conversation from {conversation['src_addr']} completed with {segment_count} segments in {duration:.1f}s",
+            f"Conversation from {conversation['src_addr']} completed with {segment_count} segments in {duration:.1f}s: {complete_text[:100]}{'...' if len(complete_text) > 100 else ''}",
             {
                 'conversation_id': cid,
                 'segment_count': segment_count,
                 'duration': duration,
-                'src_addr': conversation['src_addr']
+                'src_addr': conversation['src_addr'],
+                'complete_text': complete_text,
+                'conversation_preview': complete_text[:200]
             }
         )
 
@@ -445,23 +522,50 @@ async def logged_conversation_handler(conversation, llm_handler):
             'total_length': len(conversation.complete_text),
             'duration': conversation.end_time - conversation.start_time,
             'words': len(conversation.complete_text.split()),
-            'handler_type': 'llm_enhanced'
+            'handler_type': 'llm_enhanced',
+            'complete_conversation_text': conversation.complete_text  # Log full text
+        }
+    )
+    
+    # Log the conversation content in a dedicated log entry
+    logger.info(
+        f"CONVERSATION CONTENT [{conversation.cid[:8]}]: {conversation.complete_text}",
+        extra={
+            'conversation_id': conversation.cid,
+            'event_type': 'conversation_analysis',
+            'full_conversation': conversation.complete_text,
+            'src_addr': conversation.src_addr,
+            'word_count': len(conversation.complete_text.split())
         }
     )
     
     try:
         # Use LLM to analyze
         start_time = time.time()
+        analysis_prompt = f"Analyze this conversation and provide insights: {conversation.complete_text}"
         analysis = await llm_handler.analyze_conversation(conversation.complete_text)
         analysis_time = time.time() - start_time
         
         logger.info(
-            f"LLM conversation analysis: {analysis}",
+            f"LLM conversation analysis completed",
             extra={
                 'conversation_id': conversation.cid,
                 'analysis_text': analysis,
                 'analysis_time': analysis_time,
-                'analysis_length': len(analysis)
+                'analysis_length': len(analysis),
+                'original_conversation': conversation.complete_text,
+                'analysis_prompt': analysis_prompt
+            }
+        )
+        
+        # Log the analysis result separately for clarity
+        logger.info(
+            f"CONVERSATION ANALYSIS [{conversation.cid[:8]}]: {analysis}",
+            extra={
+                'conversation_id': conversation.cid,
+                'event_type': 'llm_analysis_result',
+                'full_analysis': analysis,
+                'original_text': conversation.complete_text
             }
         )
         
@@ -472,7 +576,8 @@ async def logged_conversation_handler(conversation, llm_handler):
                 extra={
                     'conversation_id': conversation.cid,
                     'text_length': len(conversation.complete_text),
-                    'sharing_threshold': 100
+                    'sharing_threshold': 100,
+                    'will_create_gossip': True
                 }
             )
             
@@ -481,13 +586,15 @@ async def logged_conversation_handler(conversation, llm_handler):
             
             gossip_content = f"Interesting conversation insight: {analysis}"
             
-            # Log the gossip creation
+            # Log the gossip creation with full content
             logger.info(
-                "Creating gossip from conversation analysis",
+                f"Creating gossip from conversation analysis: {gossip_content}",
                 extra={
                     'conversation_id': conversation.cid,
                     'gossip_content': gossip_content,
-                    'gossip_length': len(gossip_content)
+                    'gossip_length': len(gossip_content),
+                    'original_conversation': conversation.complete_text,
+                    'analysis_that_generated_gossip': analysis
                 }
             )
             
@@ -496,7 +603,8 @@ async def logged_conversation_handler(conversation, llm_handler):
             f"Error analyzing conversation {conversation.cid}: {e}",
             extra={
                 'conversation_id': conversation.cid,
-                'error_type': type(e).__name__
+                'error_type': type(e).__name__,
+                'conversation_text': conversation.complete_text
             },
             exc_info=True
         )
