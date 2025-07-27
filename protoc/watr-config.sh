@@ -33,7 +33,7 @@ function init_mon() {
 	if [[ ! -z "${IFACE}" ]]; then
 		sudo ifconfig "${IFACE}" down
 		sudo iwconfig "${IFACE}" mode monitor
-		sudo ifconfig "${IFACE}" multicast
+		#sudo ifconfig "${IFACE}" multicast
 		sudo ifconfig "${IFACE}" up
 		#sudo iwconfig "${IFACE}" txpower 15
 		#sudo iwconfig "${IFACE}" sens -80
@@ -41,7 +41,7 @@ function init_mon() {
 		#sudo iwconfig "${IFACE}" power off
 		#sudo iwconfig "${IFACE}" rate 2M
 		sudo iwconfig "${IFACE}" chan ${WATR_CHAN}
-		sudo iwconfig "${IFACE}" rts ${WATR_RTS}
+		#sudo iwconfig "${IFACE}" rts ${WATR_RTS}
 		#sudo iwconfig "${IFACE}" frag 512
 		#sudo iwconfig "${IFACE}" modu auto
 		sudo iwconfig "${IFACE}"
