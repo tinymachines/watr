@@ -20,7 +20,7 @@ from social_handler import NetworkGossip, NetworkVote
 class LLMSocialHandler(WATRHandler):
     """Social handler enhanced with LLM intelligence"""
     
-    def __init__(self, node: 'WATRNode', model: str = "qwen3:0.6b"):
+    def __init__(self, node: 'WATRNode', model: str = "gemma3:1b"):
         super().__init__(node)
         self.model = model
         self.client = AsyncClient()
