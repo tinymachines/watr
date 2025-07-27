@@ -702,7 +702,7 @@ async def main():
         main_logger.info(
             f"Generated opening message",
             extra={
-                'message': opening_message,
+                'opening_message': opening_message,  # FIXED: Changed from 'message' to 'opening_message'
                 'generation_time': opening_time,
                 'personality_role': llm_social_handler.personality_traits['role']
             }
