@@ -52,12 +52,18 @@ class WATRJSONFormatter(logging.Formatter):
             'line': record.lineno
         }
         
-        # Add all custom attributes
+        # Add all custom attributes, excluding built-in LogRecord attributes
+        # FIXED: Added 'message' to the exclusion list to prevent conflicts
+        excluded_attributes = {
+            'name', 'msg', 'args', 'levelname', 'levelno', 'pathname', 
+            'filename', 'module', 'lineno', 'funcName', 'created', 
+            'msecs', 'relativeCreated', 'thread', 'threadName', 
+            'processName', 'process', 'stack_info', 'exc_info', 'exc_text',
+            'message'  # Added this to prevent overwrite error
+        }
+        
         for key, value in record.__dict__.items():
-            if key not in ['name', 'msg', 'args', 'levelname', 'levelno', 'pathname', 
-                          'filename', 'module', 'lineno', 'funcName', 'created', 
-                          'msecs', 'relativeCreated', 'thread', 'threadName', 
-                          'processName', 'process', 'stack_info', 'exc_info', 'exc_text']:
+            if key not in excluded_attributes:
                 log_entry[key] = value
                 
         return json.dumps(log_entry)
@@ -229,7 +235,10 @@ class WATRLoggerMixin:
             'socialhandler': 'watr.social',
             'llmsocialhandler': 'watr.llm',
             'selfhandler': 'watr.self',
-            'handlermanager': 'watr.handlers'
+            'handlermanager': 'watr.handlers',
+            'loggedllmsocialhandler': 'watr.llm',
+            'loggedconversationhandler': 'watr.conversation', 
+            'loggedselfhandler': 'watr.self'
         }
         
         logger_name = logger_map.get(component_name, 'watr.handlers')
