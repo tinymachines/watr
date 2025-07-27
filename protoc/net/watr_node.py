@@ -65,7 +65,7 @@ class WATRNode:
             
         await self.protocol.stop()
 
-    async def chat(self, prompt: str = "Hi", model: str = "qwen3:0.6b"):
+    async def chat(self, prompt: str = "Hi", model: str = "gemma3:1b"):
         """Send a streaming chat message using Ollama"""
         cid = uuid.uuid4().hex
         seg = 0
