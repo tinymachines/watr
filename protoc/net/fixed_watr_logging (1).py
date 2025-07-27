@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, Optional
 
+
 class WATRFormatter(logging.Formatter):
     """Custom formatter for WATR network logs with structured data"""
     
