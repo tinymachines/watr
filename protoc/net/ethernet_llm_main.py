@@ -175,10 +175,11 @@ async def main():
         llm_handler = LLMSocialHandler(node, model=model)
         await node.load_handler("llm_social", llm_handler)
         
-        # Enhanced conversation completion
-        conv_handler.add_completion_handler(
-            lambda conv: asyncio.create_task(conversation_completion_handler(conv, llm_handler))
-        )
+        # Enhanced conversation completion - pass async function directly
+        async def enhanced_completion_handler(conv):
+            await conversation_completion_handler(conv, llm_handler)
+        
+        conv_handler.add_completion_handler(enhanced_completion_handler)
         
         # Add Ethernet-specific capability
         self_handler.add_capability(NodeCapability(
