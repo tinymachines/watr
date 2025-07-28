@@ -729,7 +729,7 @@ async def main():
             'model': model,
             'log_level': log_level,
             'log_dir': 'logs'
-        
+        }       
     )
     
     try:
