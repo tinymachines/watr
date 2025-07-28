@@ -70,12 +70,23 @@ function test_scapy() {
 }
 
 function  init_main() {
+	
 	if [[ ${COMMAND} == "startup" ]]; then
 		hw_reset "${WATR_DEVICE}"
 		init_mon "${WATR_DEVICE}"
 		test_aireplay "${WATR_DEVICE}"
 		setchan
 	fi
+
+	set WATR_ETH_INTERFACE="${WATR_ETH_INTERFACE:-eth0}"
+	set WATR_ETH_NAME="${WATR_NAME:-EthNode}"
+	set WATR_ETH_LLM="${WATR_LLM:-qwen3:0.6b}"
+	set WATR_ETH_LOGLEVEL="${WATR_ETH_LOGLEVEL:-INFO}"
+
+	export WATR_ETH_INTERFACE="${WATR_ETH_INTERFACE}"
+	export WATR_ETH_NAME="${WATR_NAME}"
+	export WATR_ETH_LLM="${WATR_LLM}"
+	export WATR_ETH_LOGLEVEL="${WATR_ETH_LOGLEVEL:-INFO}"
 }
 
 #DEVICE=$(get_monitor_device)
