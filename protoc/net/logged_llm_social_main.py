@@ -632,7 +632,7 @@ async def logged_conversation_handler(conversation, llm_handler):
             extra={
                 'conversation_id': conversation.cid,
                 'error_type': type(e).__name__,
-                'conversation_text' conversation.complete_text
+                'conversation_text': conversation.complete_text
             },
             exc_info=True
         )
