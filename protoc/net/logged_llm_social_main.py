@@ -815,7 +815,7 @@ async def main():
         main_logger.info("Generating intelligent network introduction")
         intro_start = time.time()
         await llm_social_handler._send_llm_introduction(None, "network", {})
-        intro_time = time.time() - intro_sart
+        intro_time = time.time() - intro_start
         
         main_logger.info(
             f"Network introduction sent",
