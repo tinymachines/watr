@@ -265,19 +265,32 @@ class LoggedConversationHandler(ConversationAccumulatorHandler, WATRLoggerMixin)
                     'is_terminator': text is None,
                     'text_length': len(text) if text else 0,
                     'segment_text': text,  # Log the actual segment content
+                    'segment_type': type(text).__name__,  # Debug: log the type
                     'active_conversations': len(self.active_conversations)
                 }
             )
             
-            # Log segment content for easier debugging
-            if text:
+            # Log segment content for easier debugging with type information
+            if text is not None:
                 self.logger.info(
                     f"Conversation segment content: {text}",
                     extra={
                         **self.log_extra,
                         'conversation_id': cid,
                         'segment': seg,
-                        'full_segment_text': text
+                        'full_segment_text': text,
+                        'segment_value_type': type(text).__name__,
+                        'segment_repr': repr(text)  # This will show quotes for strings, etc.
+                    }
+                )
+            else:
+                self.logger.info(
+                    f"Conversation terminator received",
+                    extra={
+                        **self.log_extra,
+                        'conversation_id': cid,
+                        'segment': seg,
+                        'is_terminator': True
                     }
                 )
         
@@ -293,8 +306,22 @@ class LoggedConversationHandler(ConversationAccumulatorHandler, WATRLoggerMixin)
         segment_count = len(conversation['segments'])
         duration = time.time() - conversation['start_time']
         
-        # Build complete conversation text for logging
-        complete_text = ''.join(conversation['segments'])
+        # Build complete conversation text for logging - safely convert all segments to strings
+        try:
+            # Convert all segments to strings to handle any type mismatches
+            string_segments = [str(segment) for segment in conversation['segments']]
+            complete_text = ''.join(string_segments)
+        except Exception as e:
+            self.logger.error(
+                f"Error building conversation text: {e}",
+                extra={
+                    **self.log_extra,
+                    'conversation_id': cid,
+                    'segments_types': [type(seg).__name__ for seg in conversation['segments']],
+                    'segments_raw': conversation['segments']
+                }
+            )
+            complete_text = f"[Error reconstructing conversation: {e}]"
         
         self.logger.info(
             f"Completing conversation {cid[:8]}",
@@ -306,7 +333,8 @@ class LoggedConversationHandler(ConversationAccumulatorHandler, WATRLoggerMixin)
                 'src_addr': conversation['src_addr'],
                 'complete_conversation_text': complete_text,  # Log full conversation
                 'conversation_length': len(complete_text),
-                'word_count': len(complete_text.split())
+                'word_count': len(complete_text.split()),
+                'segments_debug': conversation['segments']  # Debug info
             }
         )
         
@@ -604,7 +632,7 @@ async def logged_conversation_handler(conversation, llm_handler):
             extra={
                 'conversation_id': conversation.cid,
                 'error_type': type(e).__name__,
-                'conversation_text': conversation.complete_text
+                'conversation_text' conversation.complete_text
             },
             exc_info=True
         )
@@ -701,7 +729,7 @@ async def main():
             'model': model,
             'log_level': log_level,
             'log_dir': 'logs'
-        }
+        
     )
     
     try:
@@ -787,7 +815,7 @@ async def main():
         main_logger.info("Generating intelligent network introduction")
         intro_start = time.time()
         await llm_social_handler._send_llm_introduction(None, "network", {})
-        intro_time = time.time() - intro_start
+        intro_time = time.time() - intro_sart
         
         main_logger.info(
             f"Network introduction sent",
@@ -868,7 +896,7 @@ async def main():
                 goodbye = await llm_social_handler._generate_llm_response(
                     "Generate a brief goodbye for leaving the mesh network", max_words=20
                 )
-                main_logger.info(f"AI-generated goodbye: {goodbye}")
+                mai_logger.info(f"AI-generated goodbye: {goodbye}")
                 print(f"🤖💬 {goodbye}")
         except:
             pass
