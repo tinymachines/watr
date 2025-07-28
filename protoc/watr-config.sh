@@ -56,6 +56,11 @@ function init_mon() {
 	#sudo ./wifi-monitor-setup "${DEVICE}"
 }
 
+function setchan() {
+	sudo iwconfig ${WATR_DEVICE} ${WATR_CHAN}
+	iw dev
+}
+
 function test_aireplay() {
 	sudo aireplay-ng --test "${1}"
 }
@@ -69,6 +74,7 @@ function  init_main() {
 		hw_reset "${WATR_DEVICE}"
 		init_mon "${WATR_DEVICE}"
 		test_aireplay "${WATR_DEVICE}"
+		setchan
 	fi
 }
 
