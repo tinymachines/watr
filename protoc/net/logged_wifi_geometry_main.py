@@ -18,6 +18,7 @@ from watr_node import WATRNode
 from watr_handlers import ConversationAccumulatorHandler, handle_completed_conversation
 from self_handler import SelfHandler, NodeCapability
 from llm_social_handler import LLMSocialHandler
+from social_handler import NetworkGossip
 from wifi_geometry_handler import LoggedWiFiGeometryHandler, GeometryEstimate
 from chunked_message_handler import ChunkedMessageHandler
 
@@ -38,6 +39,42 @@ class GeometryAwareLLMHandler(LLMSocialHandler, WATRLoggerMixin):
                 **self.log_extra,
                 'model': model,
                 'has_wifi_handler': wifi_handler is not None
+            }
+        )
+    
+    async def share_gossip(self, content: str):
+        """Share gossip with the network (from SocialHandler)"""
+        import uuid
+        from social_handler import NetworkGossip
+        
+        gossip_id = str(uuid.uuid4())
+        self_handler = self.node.handler_manager.handlers.get('self')
+        
+        gossip = NetworkGossip(
+            gossip_id=gossip_id,
+            originator=self_handler.identity.name if self_handler else "Unknown",
+            content=content,
+            created_at=time.time()
+        )
+        
+        self.gossip_heard[gossip_id] = gossip
+        
+        self.node.send_message('network_gossip', {
+            'gossip_id': gossip.gossip_id,
+            'originator': gossip.originator,
+            'content': gossip.content,
+            'created_at': gossip.created_at,
+            'hops': gossip.hops,
+            'seen_by': gossip.seen_by
+        })
+        
+        self.logger.info(
+            f"Shared gossip: {content[:50]}...",
+            extra={
+                **self.log_extra,
+                'gossip_id': gossip_id,
+                'content_length': len(content),
+                'event_type': 'gossip_shared'
             }
         )
     
