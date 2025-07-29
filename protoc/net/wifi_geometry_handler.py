@@ -51,12 +51,13 @@ class GeometryEstimate:
 class LoggedWiFiGeometryHandler(WATRHandler, WATRLoggerMixin):
     """WiFi-based geometry discovery with comprehensive logging"""
     
-    def __init__(self, node, scan_interval: int = 300, location_hint: str = None):
+    def __init__(self, node, scan_interval: int = 300, location_hint: str = None, chunk_handler=None):
         WATRLoggerMixin.__init__(self)
         WATRHandler.__init__(self, node)
         
         self.scan_interval = scan_interval  # seconds between scans
         self.location_hint = location_hint  # e.g., "Building A Floor 2"
+        self.chunk_handler = chunk_handler  # For sending large scan data
         
         # Data storage
         self.my_scans: List[NodeScanResult] = []
@@ -77,6 +78,7 @@ class LoggedWiFiGeometryHandler(WATRHandler, WATRLoggerMixin):
                 **self.log_extra,
                 'scan_interval': scan_interval,
                 'location_hint': location_hint,
+                'has_chunk_handler': chunk_handler is not None,
                 'handled_message_types': self.get_handled_message_types()
             }
         )
@@ -371,10 +373,27 @@ class LoggedWiFiGeometryHandler(WATRHandler, WATRLoggerMixin):
             'networks': [asdict(net) for net in scan_result.networks]
         }
         
-        self.node.send_message('wifi_scan', payload)
+        # Check payload size
+        payload_size = len(json.dumps(payload).encode('utf-8'))
+        
+        if self.chunk_handler and payload_size > 1000:  # Use chunking for large scans
+            self.logger.debug(
+                f"Using chunked transmission for large scan",
+                extra={
+                    **self.log_extra,
+                    'payload_size': payload_size,
+                    'network_count': len(scan_result.networks)
+                }
+            )
+            await self.chunk_handler.send_chunked_message('wifi_scan', payload)
+        else:
+            # Small enough to send directly
+            self.node.send_message('wifi_scan', payload)
         
         self.log_message_sent('wifi_scan', payload, 'broadcast', {
-            'network_count': len(scan_result.networks)
+            'network_count': len(scan_result.networks),
+            'payload_size': payload_size,
+            'chunked': payload_size > 1000
         })
     
     async def _analysis_loop(self):

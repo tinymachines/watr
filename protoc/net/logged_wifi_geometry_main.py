@@ -19,6 +19,7 @@ from watr_handlers import ConversationAccumulatorHandler, handle_completed_conve
 from self_handler import SelfHandler, NodeCapability
 from llm_social_handler import LLMSocialHandler
 from wifi_geometry_handler import LoggedWiFiGeometryHandler, GeometryEstimate
+from chunked_message_handler import ChunkedMessageHandler
 
 
 class GeometryAwareLLMHandler(LLMSocialHandler, WATRLoggerMixin):
@@ -390,12 +391,29 @@ async def main():
         # Register conversation capability
         self_handler.register_conversation_capability()
         
+        # Add chunked message handler for large payloads
+        chunk_handler = ChunkedMessageHandler(node, chunk_size=1000)
+        await node.load_handler("chunk_handler", chunk_handler)
+        
+        main_logger.info(
+            "Chunked message handler loaded",
+            extra={
+                'chunk_size': chunk_handler.chunk_size,
+                'timeout': chunk_handler.timeout
+            }
+        )
+        
         # Add WiFi geometry handler
         wifi_handler = LoggedWiFiGeometryHandler(
             node,
             scan_interval=180,  # 3 minutes
-            location_hint=location_hint
+            location_hint=location_hint,
+            chunk_handler=chunk_handler  # Pass chunk handler for large scans
         )
+        
+        # Register wifi_scan handler with chunk handler for reassembly
+        chunk_handler.register_message_handler('wifi_scan', wifi_handler._handle_wifi_scan)
+        
         await node.load_handler("wifi_geometry", wifi_handler)
         
         # Add geometry-aware LLM handler
@@ -417,6 +435,15 @@ async def main():
         )
         
         # Add capabilities
+        self_handler.add_capability(NodeCapability(
+            name="chunked_messaging",
+            version="1.0",
+            description="Support for chunked transmission of large messages",
+            message_types=["chunk"],
+            created_at=time.time(),
+            performance_metrics={"chunk_size": chunk_handler.chunk_size}
+        ))
+        
         self_handler.add_capability(NodeCapability(
             name="wifi_geometry_discovery",
             version="1.0", 
