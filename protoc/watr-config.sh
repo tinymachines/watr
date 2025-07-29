@@ -4,8 +4,8 @@ source ${WATR_ROOT}/watr-header.sh
 
 function hw_reset() {
 
-	local IFACE="${1}"
-	sudo ifconfig "${IFACE}" down
+	local WATR_DEVICE="${1}"
+	sudo ifconfig "${WATR_DEVICE}" down
 
 	read -ra PARTS<<<$(lsusb | grep -iE "wireless|realtek|801[.]11" | sed --expression "s/[^0-9 ]/ /g")
 
@@ -28,23 +28,23 @@ function get_monitor_device() {
 
 function init_mon() {
 
-	local IFACE="${1}"
+	#local WATR_DEVICE="${1}"
 
-	if [[ ! -z "${IFACE}" ]]; then
-		sudo ifconfig "${IFACE}" down
-		sudo iwconfig "${IFACE}" mode monitor
-		#sudo ifconfig "${IFACE}" multicast
-		sudo ifconfig "${IFACE}" up
-		#sudo iwconfig "${IFACE}" txpower 15
-		#sudo iwconfig "${IFACE}" sens -80
-		#sudo iwconfig "${IFACE}" retry 16
-		#sudo iwconfig "${IFACE}" power off
-		#sudo iwconfig "${IFACE}" rate 2M
-		sudo iwconfig "${IFACE}" chan ${WATR_CHAN}
-		#sudo iwconfig "${IFACE}" rts ${WATR_RTS}
-		#sudo iwconfig "${IFACE}" frag 512
-		#sudo iwconfig "${IFACE}" modu auto
-		sudo iwconfig "${IFACE}"
+	if [[ ! -z "${WATR_DEVICE}" ]]; then
+		sudo ifconfig "${WATR_DEVICE}" down
+		sudo iwconfig "${WATR_DEVICE}" mode monitor
+		#sudo ifconfig "${WATR_DEVICE}" multicast
+		sudo ifconfig "${WATR_DEVICE}" up
+		#sudo iwconfig "${WATR_DEVICE}" txpower 15
+		#sudo iwconfig "${WATR_DEVICE}" sens -80
+		#sudo iwconfig "${WATR_DEVICE}" retry 16
+		#sudo iwconfig "${WATR_DEVICE}" power off
+		#sudo iwconfig "${WATR_DEVICE}" rate 2M
+		sudo iwconfig "${WATR_DEVICE}" chan ${WATR_CHAN}
+		#sudo iwconfig "${WATR_DEVICE}" rts ${WATR_RTS}
+		#sudo iwconfig "${WATR_DEVICE}" frag 512
+		#sudo iwconfig "${WATR_DEVICE}" modu auto
+		sudo iwconfig "${WATR_DEVICE}"
 	else
 		:
 	fi
@@ -59,14 +59,13 @@ function init_mon() {
 function init_wifi() {
 	
 	if [[ ! -z ${WATR_WIFI} ]] && [[ ! -z ${WATR_SSID} ]] && [[ ! -z ${WATR_PASS}  ]]; then
-		#sudo ip link set ${WATR_WIFI} down
-		#sudo ip link set ${WATR_WIFI} up
-		echo "sudo nmcli device wifi connect "${WATR_SSID}" password "${WATR_PASS}" ifname "${WATR_WIFI}" "
+		sudo ip link set ${WATR_WIFI} up
+		sudo nmcli device wifi connect "${WATR_SSID}" password "${WATR_PASS}" ifname "${WATR_WIFI}"
 	fi
 }
 
 function setchan() {
-	sudo iwconfig ${WATR_DEVICE} ${WATR_CHAN}
+	sudo iwconfig ${WATR_DEVICE} chan ${WATR_CHAN}
 	iw dev
 }
 
