@@ -295,7 +295,7 @@ async def demo_geometry_behaviors(llm_handler, wifi_handler, delay=60):
                 options = ["Yes - form sub-networks", "No - stay fully distributed", "Sometimes - based on task", "Let clusters self-organize"]
                 
                 vote_id = str(uuid.uuid4())
-                await llm_handler.node.send_message('network_vote', {
+                llm_handler.node.send_message('network_vote', {
                     'vote_id': vote_id,
                     'question': question,
                     'options': options,
@@ -323,7 +323,7 @@ async def demo_geometry_behaviors(llm_handler, wifi_handler, delay=60):
                     
                     for peer in my_cluster:
                         if peer != llm_handler.node.protocol.src_addr:
-                            await llm_handler.node.send_message('social_chat', {
+                            llm_handler.node.send_message('social_chat', {
                                 'sender_id': llm_handler.node.handler_manager.handlers['self'].identity.node_id,
                                 'sender_name': llm_handler.node.handler_manager.handlers['self'].identity.name,
                                 'content': f"[Cluster message] {msg}",
