@@ -86,7 +86,11 @@ function  init_main() {
 	export WATR_ETH_INTERFACE="${WATR_ETH_INTERFACE}"
 	export WATR_ETH_NAME="${WATR_NAME}"
 	export WATR_ETH_LLM="${WATR_LLM}"
-	export WATR_ETH_LOGLEVEL="${WATR_ETH_LOGLEVEL:-INFO}"
+	export WATR_ETH_LOGLEVEL="${WATR_ETH_LOGLEVEL}"
+
+	if [[ ! -z ${WATR_WIFI} ]] && [[ ! -z ${WATR_SSID} ]] && [[ ! -z ${WATR_PASS}  ]]; then
+		sudo nmcli ${WATR_WIFI} wifi connect ${WATR_SSID} password ${WATR_PASS}
+	fi
 }
 
 #DEVICE=$(get_monitor_device)
