@@ -20,3 +20,4 @@ receive-test
 ./logs/*
 ./conf/*
 pass.txt
+.envname

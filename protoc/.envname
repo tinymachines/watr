@@ -1,4 +1,4 @@
 #!/bin/bash
 
-WATR_NAME="Alice"
-WATR_ETH_NAME="Alice"
+WATR_NAME="Bob"
+WATR_ETH_NAME="Bob"
