@@ -101,7 +101,6 @@ class ConversationAccumulatorHandler(WATRHandler):
             print(f"Chat message missing conversation ID: {payload}")
             return
         
-        print(f"Received chat segment {seg} for conversation {cid[:8]}...")
         
         # Initialize conversation if new
         if cid not in self.active_conversations:
@@ -111,6 +110,7 @@ class ConversationAccumulatorHandler(WATRHandler):
                 'start_time': time.time(),
                 'last_segment': -1
             }
+            print(f"Received chat start for conversation {cid[:8]}...")
             
             # Start timeout task
             self.timeout_tasks[cid] = asyncio.create_task(
