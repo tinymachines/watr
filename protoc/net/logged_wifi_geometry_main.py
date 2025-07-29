@@ -464,12 +464,21 @@ async def main():
             )
         )
         
+        # Save reference to main event loop for handlers
+        main_loop = asyncio.get_running_loop()
+        
         # Enhanced conversation handler
-        conv_handler.add_completion_handler(
-            lambda conv: asyncio.create_task(
-                logged_conversation_handler(conv, llm_handler)
-            )
-        )
+        def conversation_completion_wrapper(conv):
+            # Schedule the async handler on the main event loop
+            try:
+                asyncio.run_coroutine_threadsafe(
+                    logged_conversation_handler(conv, llm_handler), 
+                    main_loop
+                )
+            except Exception as e:
+                main_logger.error(f"Error scheduling conversation handler: {e}", exc_info=True)
+        
+        conv_handler.add_completion_handler(conversation_completion_wrapper)
         
         # Add capabilities
         self_handler.add_capability(NodeCapability(
@@ -658,6 +667,18 @@ import uuid
 async def logged_conversation_handler(conversation, llm_handler):
     """Fully logged conversation completion handler"""
     logger = logging.getLogger('watr.conversation')
+    
+    # Skip empty conversations
+    if not conversation.complete_text or len(conversation.complete_text.strip()) == 0:
+        logger.debug(
+            "Skipping empty conversation",
+            extra={
+                'conversation_id': conversation.cid,
+                'src_addr': conversation.src_addr,
+                'segment_count': len(conversation.segments)
+            }
+        )
+        return
     
     logger.info(
         "Conversation completion analysis started",
