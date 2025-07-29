@@ -3,7 +3,7 @@
 source ${WATR_ROOT}/watr-header.sh
 
 function hw_reset() {
-	
+
 	local IFACE="${1}"
 	sudo ifconfig "${IFACE}" down
 
@@ -56,6 +56,15 @@ function init_mon() {
 	#sudo ./wifi-monitor-setup "${DEVICE}"
 }
 
+function init_wifi() {
+	
+	if [[ ! -z ${WATR_WIFI} ]] && [[ ! -z ${WATR_SSID} ]] && [[ ! -z ${WATR_PASS}  ]]; then
+		#sudo ip link set ${WATR_WIFI} down
+		#sudo ip link set ${WATR_WIFI} up
+		echo "sudo nmcli device wifi connect "${WATR_SSID}" password "${WATR_PASS}" ifname "${WATR_WIFI}" "
+	fi
+}
+
 function setchan() {
 	sudo iwconfig ${WATR_DEVICE} ${WATR_CHAN}
 	iw dev
@@ -72,9 +81,19 @@ function test_scapy() {
 function  init_main() {
 	
 	if [[ ${COMMAND} == "startup" ]]; then
+		
+		echo "RESET HW"
 		hw_reset "${WATR_DEVICE}"
+
+		echo "INIT MON"
 		init_mon "${WATR_DEVICE}"
+
+		echo "INIT WIFI"
+		init_wifi
+
+		echo "TEST MON"
 		test_aireplay "${WATR_DEVICE}"
+
 		setchan
 	fi
 
@@ -88,9 +107,11 @@ function  init_main() {
 	export WATR_ETH_LLM="${WATR_LLM}"
 	export WATR_ETH_LOGLEVEL="${WATR_ETH_LOGLEVEL}"
 
-	if [[ ! -z ${WATR_WIFI} ]] && [[ ! -z ${WATR_SSID} ]] && [[ ! -z ${WATR_PASS}  ]]; then
-		sudo nmcli ${WATR_WIFI} wifi connect ${WATR_SSID} password ${WATR_PASS}
-	fi
+
+	set WATR_WIFI="${WATR_WIFI}"
+	set WATR_SSID="${WATR_SSID}"
+	export WATR_WIFI="${WATR_WIFI}"
+	export WATR_SSID="${WATR_SSID}"
 }
 
 #DEVICE=$(get_monitor_device)
