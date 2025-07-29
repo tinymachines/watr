@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source "${WATR_ROOT}/.env"
+source "${WATR_ROOT}/.envname"
 
 export WATR_ROOT="${WATR_ROOT}"
 set WATR_ROOT="${WATR_ROOT}"
